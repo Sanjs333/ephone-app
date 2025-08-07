@@ -6309,29 +6309,36 @@ async function renderQzonePosts() {
         }
         
         let commentsHtml = '';
-        if (post.comments && post.comments.length > 0) {
-            commentsHtml = '<div class="post-comments-container">';
-            post.comments.forEach((comment, index) => {
-                const isReply = comment.replyToIndex !== undefined && comment.replyToIndex !== null;
-                let replyTag = '';
-                
-                if (isReply) {
-                    const parentComment = post.comments[comment.replyToIndex];
-                    if (parentComment) {
-                        replyTag = `<span class="reply-to-tag">回复 @${parentComment.commenterName}</span>`;
-                    }
-                }
-
-                commentsHtml += `
-                    <div class="comment-item ${isReply ? 'is-reply' : ''}" data-comment-index="${index}">
-                        <span class="commenter-name">${comment.commenterName}:</span>
-                        ${replyTag}
-                        <span class="comment-text">${comment.text}</span>
-                        <span class="comment-delete-btn" data-comment-index="${index}">×</span>
-                    </div>`;
-            });
-            commentsHtml += '</div>';
+if (post.comments && post.comments.length > 0) {
+    commentsHtml = '<div class="post-comments-container">';
+    post.comments.forEach((comment, index) => {
+        const isReply = comment.replyToIndex !== undefined && comment.replyToIndex !== null;
+        let replyTag = '';
+        
+        if (isReply) {
+            const parentComment = post.comments[comment.replyToIndex];
+            if (parentComment) {
+                replyTag = `<span class="reply-to-tag">回复 @${parentComment.commenterName}</span>`;
+            }
         }
+
+        let commentContentHtml = '';
+        if (typeof comment.text === 'string' && STICKER_REGEX.test(comment.text)) {
+            commentContentHtml = `<img src="${comment.text}" class="sticker-image" style="max-width: 60px; max-height: 60px; vertical-align: middle;">`;
+        } else {
+            commentContentHtml = `<span class="comment-text">${comment.text}</span>`;
+        }
+
+        commentsHtml += `
+            <div class="comment-item ${isReply ? 'is-reply' : ''}" data-comment-index="${index}">
+                <span class="commenter-name">${comment.commenterName}:</span>
+                ${replyTag}
+                ${commentContentHtml}
+                <span class="comment-delete-btn" data-comment-index="${index}">×</span>
+            </div>`;
+    });
+    commentsHtml += '</div>';
+}
 
         const userNickname = state.qzoneSettings.nickname;
         const isLikedByUser = post.likes && post.likes.includes(userNickname);
@@ -14862,18 +14869,18 @@ if (sendBtn) {
 
     post.comments.push(newComment);
     await db.qzonePosts.update(postId, { comments: post.comments });
-
-    if (post.authorId !== 'user' && state.chats[post.authorId]) {
-        await triggerAiQzoneCommentResponse(post.authorId, postId, newComment);
-    }
-
+    
     commentInput.value = '';
     postContainer.dataset.replyToIndex = '';
     postContainer.dataset.replyToName = '';
     const replyIndicator = postContainer.querySelector('.reply-indicator');
     if(replyIndicator) replyIndicator.classList.remove('visible');
-    
     await renderQzonePosts();
+    
+    if (post.authorId !== 'user' && state.chats[post.authorId]) {
+        triggerAiQzoneCommentResponse(post.authorId, postId, newComment);
+    }
+    
     return;
 }
 });
