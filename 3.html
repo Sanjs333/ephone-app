@@ -13672,7 +13672,6 @@ state.globalSettings.backgroundActivityInterval = parseInt(intervalInput.value) 
 state.globalSettings.blockCooldownHours = parseFloat(document.getElementById('block-cooldown-input').value) || 1;
 await db.globalSettings.put(state.globalSettings);
 
-// 动态启动或停止模拟器
 stopBackgroundSimulation();
 if (state.globalSettings.enableBackgroundActivity) {
     startBackgroundSimulation();
@@ -13680,7 +13679,6 @@ if (state.globalSettings.enableBackgroundActivity) {
 } else {
     console.log("后台活动模拟已停止。");
 }
-// ▲▲▲ 替换结束 ▲▲▲
 
 alert('API设置已保存!'); });
 
