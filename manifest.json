@@ -1,0 +1,21 @@
+{
+  "name": "♥Phone",
+  "short_name": "♥Phone",
+  "start_url": ".",
+  "display": "fullscreen",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "description": "模拟手机的Web应用",
+  "icons": [
+    {
+      "src": "https://i.imgur.com/M0cwMDc.png",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "https://i.imgur.com/M0cwMDc.png",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}
