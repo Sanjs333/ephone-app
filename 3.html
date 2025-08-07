@@ -8068,7 +8068,7 @@ const memories = await db.memories.where('chatId').equals(chatId).sortBy('timest
 const recentMemories = memories.slice(-5);
 let memoryContext = '（暂无特别的共同回忆）';
 if (recentMemories.length > 0) {
-memoryContext = recentMemories.map(mem => - ${mem.content.replace(/\n/g, '\n  ')}).join('\n');
+memoryContext = recentMemories.map(mem => `- ${mem.content.replace(/\n/g, '\n  ')}`).join('\n');
 }
 
 const lastAiTurnIndex = chat.history.findLastIndex(msg => msg.role === 'assistant');
