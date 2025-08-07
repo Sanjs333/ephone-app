@@ -1113,10 +1113,10 @@ body {
 .post-footer {
     margin-top: 15px;
     padding-top: 10px;
-    border-top: 1px solid #f0f0f0; /* 用一条浅色线分隔 */
+    border-top: 1px solid #f0f0f0;
     display: flex;
     align-items: center;
-    gap: 8px; /* 调整整体间距 */
+    gap: 8px;
 }
 
 /* 评论区容器 */
@@ -4373,18 +4373,6 @@ input:checked + .slider:before {
 }
 /* ▼▼▼ 动态评论区 - 嵌套回复与交互样式 ▼▼▼ */
 
-.post-footer .reply-indicator {
-    display: none;
-    width: 100%;
-    padding: 6px 10px;
-    margin-bottom: 8px;
-    background-color: #f0f2f5;
-    border-radius: 8px;
-    font-size: 12px;
-    color: var(--text-secondary);
-    justify-content: space-between;
-    align-items: center;
-}
 #phone-screen.dark-mode .post-footer .reply-indicator {
     background-color: #3a3a3c;
 }
@@ -4399,8 +4387,8 @@ input:checked + .slider:before {
 
 .comment-item.is-reply {
     margin-left: 38px;
-    margin-top: 6px;
-    padding: 6px 8px;
+    margin-top: 3px;
+    padding: 3px 4px;
     border-radius: 6px;
     background-color: #f0f2f5;
 }
@@ -6366,8 +6354,7 @@ if (post.comments && post.comments.length > 0) {
 
              if (cancelReplyBtn && replyIndicator) {
                 cancelReplyBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const postContainer = cancelReplyBtn.closest('.qzone-post-container');
+				const footer = postContainer.querySelector('.post-footer');
                     if(postContainer) {
                         postContainer.dataset.replyToIndex = '';
                         postContainer.dataset.replyToName = '';
@@ -14824,12 +14811,8 @@ if (commentItem) {
         postContainer.dataset.replyToName = parentComment.commenterName;
         
         const footer = postContainer.querySelector('.post-footer');
-        const replyIndicator = footer.querySelector('.reply-indicator');
-        const replyIndicatorText = footer.querySelector('.reply-indicator-text');
         const commentInput = footer.querySelector('.comment-input');
         
-        replyIndicatorText.textContent = `正在回复 @${parentComment.commenterName}`;
-        replyIndicator.classList.add('visible');
         commentInput.placeholder = `回复 @${parentComment.commenterName}:`;
         commentInput.focus();
     }
@@ -14868,7 +14851,7 @@ if (sendBtn) {
     if(replyIndicator) replyIndicator.classList.remove('visible');
     commentInput.placeholder = '说点什么吧~';
 
-await renderQzonePosts();
+    await renderQzonePosts();
     
     if (post.authorId !== 'user' && state.chats[post.authorId]) {
         triggerAiQzoneCommentResponse(post.authorId, postId, newComment);
