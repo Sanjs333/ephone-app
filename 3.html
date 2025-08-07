@@ -5778,8 +5778,7 @@ input:checked + .slider:before {
     }
 
    function extractArray(text) {
-        // 正则表达式模式：匹配开头的时间戳部分和后续的JSON数组
-        const pattern = /^\(Timestamp: (\d+)\)(.*)$/s;
+        const pattern = /^\(Timestamp: (\d+)\)([\s\S]*)$/;
         const match = text.match(pattern);
 
         if (match) {
@@ -5837,8 +5836,7 @@ input:checked + .slider:before {
             accept_transfer:'回应了转账-接受',
             decline_transfer:'回应了转账-拒绝/退款',
             quote_reply:'引用了回复',
-            text:'',
-        }
+        };
         let res = extractArray(item.content)
 
         if(Array.isArray(res)){
@@ -5899,6 +5897,7 @@ input:checked + .slider:before {
                     return [{text:`${time}${obj.content}`}]
                 }
             }
+        }
 
 if(Array.isArray(res) && res.length > 1 && res[1].content) {
         res = `${res[0]}${res[1].content}`
@@ -7860,10 +7859,8 @@ async function openChat(chatId) {
         triggerAiResponse();
     }
     
-    // 【核心修正】根据是否为群聊，显示或隐藏投票按钮
     document.getElementById('send-poll-btn').style.display = chat.isGroup ? 'flex' : 'none';
 }
-// ▲▲▲ 替换结束 ▲▲▲
 
 async function triggerAiResponse() {
     if (!state.activeChatId) return;
@@ -8173,24 +8170,18 @@ ${membersPrompt}
 - **${myNickname}**: ${chat.settings.myPersona}
 
 现在，请根据以上所有规则和下方的对话历史，继续这场群聊。`;
-// ▲▲▲ 替换结束 ▲▲▲
             
-// ▼▼▼ 请用这【一整块已修复时间戳】的代码，替换旧的【群组聊天】messagesPayload构建逻辑 ▼▼▼
 messagesPayload = historySlice.map(msg => {
-    // 确定当前消息的发送者是谁
     const sender = msg.role === 'user' ? myNickname : msg.senderName;
     
     let prefix = `${sender}`;
-    // 【核心修改1】在名字后面直接加上时间戳
     prefix += ` (Timestamp: ${msg.timestamp})`;
     
     if (msg.quote) {
         prefix += ` (回复 ${msg.quote.senderName})`;
     }
-    // 最后加上冒号
     prefix += ': ';
 
-    // 处理特殊消息类型，并将前缀应用进去
     let content;
     if (msg.type === 'user_photo') content = `[${sender} 发送了一张图片，内容是：'${msg.content}']`;
     else if (msg.type === 'ai_image') content = `[${sender} 发送了一张图片]`;
@@ -8210,13 +8201,15 @@ messagesPayload = historySlice.map(msg => {
     else if (msg.type === 'poll') {
         const whoVoted = Object.values(msg.votes || {}).flat().join(', ') || '还没有人';
         content = `[系统提示：${msg.senderName} 发起了一个投票 (时间戳: ${msg.timestamp})，问题是：“${msg.question}”，选项有：[${msg.options.join(', ')}]。目前投票的人有：${whoVoted}。你可以使用 'vote' 指令参与投票。]`;
+    } else if (msg.meaning) {
+        content = `${sender}: [发送了一个表情，意思是: '${msg.meaning}']`;
+    } else if (Array.isArray(msg.content)) {
+        return { role: 'user', content: [...msg.content, { type: 'text', text: prefix }] };
+    } else {
+        content = `${prefix}${msg.content}`;
     }
-    else if (msg.meaning) content = `${sender}: [发送了一个表情，意思是: '${msg.meaning}']`;
-    else if (Array.isArray(msg.content)) return { role: 'user', content: [...msg.content, { type: 'text', text: prefix }] };
-    else content = `${prefix}${msg.content}`;
     
     return { role: 'user', content: content };
-
 }).filter(Boolean);
 
 const memories = await db.memories.where('chatId').equals(chatId).sortBy('timestamp');
@@ -8298,7 +8291,7 @@ ${chat.settings.aiAvatarLibrary && chat.settings.aiAvatarLibrary.length > 0
 - **发送图片**: \`{"type": "ai_image", "description": "图片的详细文字描述..."}\`
 - **发送语音**: \`{"type": "voice_message", "content": "语音的文字内容..."}\`
 - **发起转账**: \`{"type": "transfer", "amount": 5.20, "note": "一点心意"}\`
-- **送出礼物**: `{"type": "send_gift", "item_name": "一杯热奶茶", "reason": "看你好像有点累，给你打打气！"}`
+- **送出礼物**: \`{"type": "send_gift", "item_name": "一杯热奶茶", "reason": "看你好像有点累，给你打打气！"}\`
 - **发起外卖请求**: \`{"type": "waimai_request", "productInfo": "一杯咖啡", "amount": 25}\`
 - **回应外卖-同意**: \`{"type": "waimai_response", "status": "paid", "for_timestamp": 1688888888888}\`
 - **回应外卖-拒绝**: \`{"type": "waimai_response", "status": "rejected", "for_timestamp": 1688888888888}\`
@@ -8360,7 +8353,6 @@ ${sharedContext}
 
 messagesPayload = historySlice.map(msg => {
     if (msg.isHidden) return null;
-
     if (msg.type === 'share_card') return null;
     
     if (msg.role === 'assistant') {
@@ -8389,30 +8381,30 @@ messagesPayload = historySlice.map(msg => {
         return { role: 'assistant', content: `(Timestamp: ${msg.timestamp}) ${assistantContent}` };
     }
 
-    let contentStr = '';
-    
-    contentStr += `(Timestamp: ${msg.timestamp}) `;
-
+    // --- 以下是用户消息处理 ---
+    let contentStr = `(Timestamp: ${msg.timestamp}) `;
     if (msg.quote) {
         contentStr += `(回复 ${msg.quote.senderName}): ${msg.content}`;
     } else {
         contentStr += msg.content;
     }
     
-    if (msg.type === 'user_photo') return { role: 'user', content: `(Timestamp: ${msg.timestamp}) [你收到了一张用户描述的照片，内容是：'${msg.content}']` };
-    if (msg.type === 'voice_message') return { role: 'user', content: `(Timestamp: ${msg.timestamp}) [用户发来一条语音消息，内容是：'${msg.content}']` };
-    if (msg.type === 'transfer') return { role: 'user', content: `(Timestamp: ${msg.timestamp}) [系统提示：你于时间戳 ${msg.timestamp} 收到了来自用户的转账: ${msg.amount}元, 备注: ${msg.note}。请你决策并使用 'accept_transfer' 或 'decline_transfer' 指令回应。]` };
-    if (msg.type === 'waimai_request') return { role: 'user', content: `(Timestamp: ${msg.timestamp}) [系统提示：用户于时间戳 ${msg.timestamp} 发起了外卖代付请求，商品是“${msg.productInfo}”，金额是 ${msg.amount} 元。请你决策并使用 waimai_response 指令回应。]` };
-
-if (Array.isArray(msg.content) && msg.content[0]?.type === 'image_url') {
-    const prefix = `(Timestamp: ${msg.timestamp}) `;
-    return { role: 'user', content: [ { type: 'text', text: prefix }, ...msg.content ] };
-}
-
-    if (msg.meaning) return { role: 'user', content: `(Timestamp: ${msg.timestamp}) [用户发送了一个表情，意思是：'${msg.meaning}']` };
-    
-    return { role: msg.role, content: contentStr };
-
+    if (msg.type === 'user_photo') {
+        return { role: 'user', content: `(Timestamp: ${msg.timestamp}) [你收到了一张用户描述的照片，内容是：'${msg.content}']` };
+    } else if (msg.type === 'voice_message') {
+        return { role: 'user', content: `(Timestamp: ${msg.timestamp}) [用户发来一条语音消息，内容是：'${msg.content}']` };
+    } else if (msg.type === 'transfer') {
+        return { role: 'user', content: `(Timestamp: ${msg.timestamp}) [系统提示：你于时间戳 ${msg.timestamp} 收到了来自用户的转账: ${msg.amount}元, 备注: ${msg.note}。请你决策并使用 'accept_transfer' 或 'decline_transfer' 指令回应。]` };
+    } else if (msg.type === 'waimai_request') {
+        return { role: 'user', content: `(Timestamp: ${msg.timestamp}) [系统提示：用户于时间戳 ${msg.timestamp} 发起了外卖代付请求，商品是“${msg.productInfo}”，金额是 ${msg.amount} 元。请你决策并使用 waimai_response 指令回应。]` };
+    } else if (Array.isArray(msg.content) && msg.content[0]?.type === 'image_url') {
+        const prefix = `(Timestamp: ${msg.timestamp}) `;
+        return { role: 'user', content: [ { type: 'text', text: prefix }, ...msg.content ] };
+    } else if (msg.meaning) {
+        return { role: 'user', content: `(Timestamp: ${msg.timestamp}) [用户发送了一个表情，意思是：'${msg.meaning}']` };
+    } else {
+        return { role: msg.role, content: contentStr };
+    }
 }).filter(Boolean);
 
 if (sharedContext) {
@@ -9204,7 +9196,8 @@ case 'send_and_recall': {
         
         await db.chats.put(chat);
 
-    } catch (error) {
+    }
+    catch (error) {
         chat.history = chat.history.filter(msg => !msg.isTemporary);
         if (!chat.isGroup && chat.relationship?.status === 'pending_ai_approval') {
             chat.relationship.status = 'blocked_by_ai';
@@ -9742,17 +9735,6 @@ function runBackgroundSimulationTick() {
         }
         else if (chat.relationship?.status === 'friend' && chat.id !== state.activeChatId) {
             if (Math.random() < 0.20) { // 摇骰子逻辑保持不变
-                console.log(`角色 "${chat.name}" 被唤醒，准备独立行动...`);
-                triggerInactiveAiAction(chat.id);
-            }
-        }
-    });
-}
-// ▲▲▲ 替换结束 ▲▲▲
-        // 检查2：处理【好友关系】的正常后台活动
-        else if (chat.relationship?.status === 'friend' && chat.id !== state.activeChatId) {
-            // 这里的随机触发逻辑保持不变，因为我们不希望所有好友同时行动
-            if (Math.random() < 0.20) {
                 console.log(`角色 "${chat.name}" 被唤醒，准备独立行动...`);
                 triggerInactiveAiAction(chat.id);
             }
@@ -11357,56 +11339,6 @@ ${videoCallState.preCallContext}
     }
 }
 
-// ▼▼▼ 将这个【全新函数】粘贴到JS功能函数定义区 ▼▼▼
-function toggleCallButtons(isGroup) {
-    document.getElementById('video-call-btn').style.display = isGroup ? 'none' : 'flex';
-    document.getElementById('group-video-call-btn').style.display = isGroup ? 'flex' : 'none';
-}
-// ▲▲▲ 粘贴结束 ▲▲▲
-
-// ▼▼▼ 【全新】这个函数是本次修复的核心，请粘贴到你的JS功能区 ▼▼▼
-async function handleWaimaiResponse(originalTimestamp, choice) {
-    const chat = state.chats[state.activeChatId];
-    if (!chat) return;
-
-    const messageIndex = chat.history.findIndex(m => m.timestamp === originalTimestamp);
-    if (messageIndex === -1) return;
-
-    // 1. 更新内存中原始消息的状态
-    const originalMessage = chat.history[messageIndex];
-    originalMessage.status = choice;
-    
-    // 2. 获取当前用户的昵称，并构建对AI更清晰的系统消息
-    let systemContent;
-    const myNickname = chat.isGroup ? (chat.settings.myNickname || '我') : '我';
-    
-    if (choice === 'paid') {
-        originalMessage.paidBy = myNickname; // 记录是“我”付的钱
-        systemContent = `[系统提示：你 (${myNickname}) 为 ${originalMessage.senderName} 的外卖订单（时间戳: ${originalTimestamp}）完成了支付。此订单已关闭，其他成员不能再支付。]`;
-    } else {
-        systemContent = `[系统提示：你 (${myNickname}) 拒绝了 ${originalMessage.senderName} 的外卖代付请求（时间戳: ${originalTimestamp}）。]`;
-    }
-
-    // 3. 创建一条新的、对用户隐藏的系统消息，告知AI结果
-    const systemNote = {
-        role: 'system',
-        content: systemContent,
-        timestamp: Date.now(),
-        isHidden: true
-    };
-    chat.history.push(systemNote);
-
-    // 4. 将更新后的数据保存到数据库，并立刻重绘UI
-    await db.chats.put(chat);
-    renderChatInterface(state.activeChatId);
-    
-    // 5. 【重要】只有在支付成功后，才触发一次AI响应，让它感谢你
-    if (choice === 'paid') {
-        triggerAiResponse();
-    }
-}
-// ▲▲▲ 新函数粘贴结束 ▲▲▲
-
 /**
  * 【全新】处理用户点击头像发起的“拍一-拍”，带有自定义后缀功能
  * @param {string} chatId - 发生“拍一-拍”的聊天ID
@@ -12987,17 +12919,24 @@ function updateMusicProgressBar() {
     const currentTimeEl = document.getElementById('music-current-time');
     const totalTimeEl = document.getElementById('music-total-time');
     const progressFillEl = document.getElementById('music-progress-fill');
-    if (!audioPlayer.duration) {
+    
+    if (isNaN(audioPlayer.duration) || audioPlayer.duration <= 0) {
         currentTimeEl.textContent = "0:00";
         totalTimeEl.textContent = "0:00";
         progressFillEl.style.width = '0%';
         return;
     }
-    const progressPercent = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+
+    const currentTime = audioPlayer.currentTime;
+    const duration = audioPlayer.duration;
+    
+    const progressPercent = (currentTime / duration) * 100;
+    
     progressFillEl.style.width = `${progressPercent}%`;
-    currentTimeEl.textContent = formatMusicTime(audioPlayer.currentTime);
-    totalTimeEl.textContent = formatMusicTime(audioPlayer.duration);
-    updateActiveLyric(audioPlayer.currentTime);
+    currentTimeEl.textContent = formatMusicTime(currentTime);
+    totalTimeEl.textContent = formatMusicTime(duration);
+    
+    updateActiveLyric(currentTime);
 }
 
 /**
@@ -14602,7 +14541,7 @@ postsList.addEventListener('click', async (e) => {
             container.style.opacity = '0';
         
             setTimeout(async () => {
-		 wait db.favorites.where({ type: 'qzone_post', 'content.id': postIdToDelete }).delete();
+		 await db.favorites.where({ type: 'qzone_post', 'content.id': postIdToDelete }).delete();
                  await db.qzonePosts.delete(postIdToDelete);
                  
                  const notificationIdentifier = `(ID: ${postIdToDelete})`;
