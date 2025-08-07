@@ -676,10 +676,6 @@ body {
     margin-top: 10px; 
 }
 
-/* ▲▲▲ 新样式替换结束 ▲▲▲ */
-
-/* ▼▼▼ 把所有这些新样式粘贴到 <style> 的末尾 ▼▼▼ */
-
 /* === 动态功能栏样式 === */
 .qzone-actions-bar {
     display: flex;
@@ -924,10 +920,6 @@ body {
     margin: 0;
 }
 
-/* ▲▲▲ 新的 CSS 粘贴结束 ▲▲▲ */
-
-/* ▼▼▼ 请将这些新样式粘贴到 <style> 的末尾 ▼▼▼ */
-
 /* === 相册照片详情页 === */
 #album-photos-screen {
     background-color: #f0f2f5;
@@ -1058,12 +1050,6 @@ body {
     cursor: default;
 }
 
-/* ▲▲▲ 新样式粘贴结束 ▲▲▲ */
-
-/* ▼▼▼ 请将这些新样式粘贴到 <style> 的末尾 ▼▼▼ */
-
-/* ▼▼▼ 请用这块新CSS替换掉上一版的交互区CSS ▼▼▼ */
-
 /* === 帖子内容区 - 相对定位容器 === */
 /* === 帖子内容区 === */
 .post-main-content {
@@ -1172,10 +1158,6 @@ body {
     cursor: pointer;
 }
 
-/* ▲▲▲ 新样式粘贴结束 ▲▲▲ */
-
-/* ▼▼▼ 请将这段新样式粘贴到 <style> 的末尾 ▼▼▼ */
-
 /* === 未读消息小红点通用样式 === */
 .unread-indicator {
     position: absolute;
@@ -1207,10 +1189,6 @@ body {
     border-radius: 50%;
 }
 
-/* ▲▲▲ 新样式粘贴结束 ▲▲▲ */
-
-/* ▼▼▼ 请将这段新样式粘贴到 <style> 的末尾 ▼▼▼ */
-
 /* === 评论列表容器 === */
 .post-comments-container {
     padding: 10px 0; /* 上下留白 */
@@ -1238,9 +1216,6 @@ body {
     color: var(--text-primary);
     word-break: break-word;
 }
-/* ▲▲▲ 新样式粘贴结束 ▲▲▲ */
-
-/* ▼▼▼ 请将这段新样式粘贴到 <style> 的末尾 ▼▼▼ */
 
 /* === 帖子点赞区域样式 === */
 .post-likes-section {
@@ -1259,20 +1234,16 @@ body {
 .post-likes-section .like-icon {
     width: 16px;
     height: 16px;
-    fill: currentColor; /* 让SVG图标继承父元素的颜色 */
-    flex-shrink: 0; /* 防止图标被压缩 */
+    fill: currentColor;
+    flex-shrink: 0;
 }
-
-/* ▲▲▲ 新样式粘贴结束 ▲▲▲ */
-
-/* ▼▼▼ 请将这段新样式粘贴到 <style> 的末尾 ▼▼▼ */
 
 /* === @提及 弹出菜单样式 === */
 .at-mention-popup {
-    position: absolute; /* 相对于父元素定位 */
-    bottom: 100%; /* 显示在输入框的上方 */
-    left: 40px; /* 和输入框左侧对齐 (考虑了头像宽度) */
-    width: calc(100% - 40px); /* 宽度和输入框差不多 */
+    position: absolute;
+    bottom: 100%;
+    left: 40px;
+    width: calc(100% - 40px);
     max-height: 120px;
     overflow-y: auto;
     background-color: var(--secondary-bg);
@@ -1280,7 +1251,7 @@ body {
     border-radius: 8px;
     box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
     z-index: 10;
-    display: none; /* 默认隐藏 */
+    display: none;
 }
 
 .at-mention-item {
@@ -1298,19 +1269,12 @@ body {
 .at-mention-item:hover {
     background-color: #f5f5f5;
 }
-/* ▲▲▲ 新样式粘贴结束 ▲▲▲ */
 
-/* ▼▼▼ 请将这段新样式粘贴到 <style> 的末尾 ▼▼▼ */
-
-/* ▼▼▼ 请用下面这段【新样式】替换掉你现有的 #favorites-list 样式 ▼▼▼ */
-
-/* 让收藏视图成为一个flex容器, 从上到下排列 */
 #favorites-view {
     display: flex;
     flex-direction: column;
 }
 
-/* 确保收藏页的header高度固定，不被压缩 */
 #favorites-view > .header {
     flex-shrink: 0;
 }
@@ -1319,24 +1283,21 @@ body {
 #favorites-list {
     flex-grow: 1; 
     overflow-y: auto; 
-    overflow-x: hidden; /* <-- 新增这行，禁止水平滚动 */
+    overflow-x: hidden;
     padding: 15px; 
     display: flex;
     flex-direction: column;
     gap: 15px; 
 }
 
-/* ▲▲▲ 替换结束 ▲▲▲ */
-
 .favorite-item-card {
     background-color: var(--secondary-bg);
     border-radius: 12px;
     padding: 15px;
     box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-    position: relative; /* 为了定位删除按钮 */
+    position: relative;
 }
 
-/* 卡片头部，包含头像、名字和来源 */
 .fav-card-header {
     display: flex;
     align-items: center;
@@ -1399,10 +1360,6 @@ body {
     background-color: #e9ecef;
     color: #ff3b30;
 }
-
-/* ▲▲▲ 新样式粘贴结束 ▲▲▲ */
-
-/* ▼▼▼ 请将这段新样式粘贴到 <style> 的末尾 ▼▼▼ */
 
 /* === 搜索栏样式 === */
 .search-bar-container {
@@ -1541,12 +1498,10 @@ body {
     width: 100%;
 }
 
-/* 当进入多选模式时：隐藏默认控件 */
 #chat-interface-screen.selection-mode .header .default-controls {
     display: none;
 }
 
-/* 当进入多选模式时：显示多选控件，并让它撑满整个头部 */
 #chat-interface-screen.selection-mode .header .selection-controls {
     display: flex;
     justify-content: space-between;
@@ -1554,39 +1509,31 @@ body {
     width: 100%;
 }
 
-/* ▼▼▼ 请将这段新样式粘贴到 <style> 的末尾 ▼▼▼ */
-
-/* === 修正：放大所有主要的“+”号按钮 === */
 #add-chat-btn,
 #add-world-book-btn,
 #create-album-btn-page {
-    font-size: 28px;   /* 显著增大字体大小，使其视觉上与旁边的图标匹配 */
-    font-weight: 300;  /* 使用更细的字重，让加号看起来更清爽，不显粗笨 */
-    position: relative;/* 允许进行位置微调 */
-    top: -1px;         /* 字体放大后，通常需要稍微向上移动一点，使其视觉上更居中 */
+    font-size: 28px;
+    font-weight: 300;
+    position: relative;
+    top: -1px;
 }
-
-/* ▲▲▲ 新样式粘贴结束 ▲▲▲ */
-
-/* ▼▼▼ 请将这些新样式粘贴到 <style> 的末尾 ▼▼▼ */
 
 /* 预览区容器样式 */
 #settings-preview-area {
     width: 100%;
-    height: 180px; /* 给一个固定的高度 */
+    height: 180px;
     background-color: #f0f2f5;
     border-radius: 8px;
     padding: 15px;
     box-sizing: border-box;
-    overflow: hidden; /* 防止内容溢出 */
+    overflow: hidden;
     display: flex;
     flex-direction: column;
-    gap: 10px; /* 预览气泡之间的间距 */
+    gap: 10px;
     border: 1px solid var(--border-color);
-    position: relative; /* 为了定位背景 */
+    position: relative;
 }
 
-/* 预览区的背景，可以和真实聊天界面同步 */
 #settings-preview-area::before {
     content: '';
     position: absolute;
@@ -1604,19 +1551,15 @@ body {
     z-index: 2;
 }
 
-/* 预览区内使用的头像要小一点 */
 #settings-preview-area .message-bubble .avatar {
     width: 30px;
     height: 30px;
 }
 
 #settings-preview-area .message-bubble .timestamp {
-    display: none; /* 预览区不需要显示时间戳 */
+    display: none;
 }
 
-/* ▲▲▲ 新样式粘贴结束 ▲▲▲ */
-
-/* ▼▼▼ 请将这段新CSS粘贴到 <style> 的末尾 ▼▼▼ */
 .existing-group-item {
     display: flex;
     justify-content: space-between;
@@ -1637,9 +1580,7 @@ body {
     cursor: pointer;
     padding: 5px;
 }
-/* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
 
-/* ▼▼▼ 请将这段新CSS粘贴到 <style> 的末尾 ▼▼▼ */
 .chat-group-container {
     border-bottom: 1px solid var(--border-color);
 }
@@ -1679,9 +1620,6 @@ body {
 .chat-group-content.collapsed {
     max-height: 0;
 }
-/* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
-
-/* ▼▼▼ 请将这段新CSS粘贴到 <style> 的末尾 ▼▼▼ */
 
 /* 格式助手按钮的容器 */
 .format-helpers {
@@ -1708,9 +1646,6 @@ body {
     background-color: #dcdfe3;
 }
 
-/* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
-
-/* ▼▼▼ 请将这段新CSS粘贴到 <style> 的末尾 ▼▼▼ */
 
 /* “…”按钮的样式 */
 .post-actions-btn {
@@ -2476,10 +2411,6 @@ body {
     transform: translateX(-90px); /* 移动的距离和删除按钮的宽度一致 */
 }
 
-/* ▲▲▲ 粘贴结束 ▲▲▲ */
-
-/* ▼▼▼ 请将这【一整块】全新的“拍一拍”样式，粘贴到 <style> 的末尾 ▼▼▼ */
-
 /* 1. “拍一拍”的屏幕震动动画 */
 @keyframes pat-shake {
     0%, 100% { transform: translateX(0); }
@@ -2521,8 +2452,6 @@ body {
     padding: 4px 12px;
     border-radius: 10px;
 }
-
-/* ▼▼▼ 请将这段新CSS粘贴到 <style> 的末尾 ▼▼▼ */
 
 /* === 修正：让顶部操作栏可以横向滚动 === */
 #chat-input-actions-top {
@@ -3160,10 +3089,6 @@ body {
     height: 14px;
     flex-shrink: 0; /* 防止图标被压缩 */
 }
-
-/* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
-
-/* ▼▼▼ 请将这段新样式粘贴到 <style> 的末尾 ▼▼▼ */
 
 /* 单条评论的容器，现在需要相对定位 */
 .comment-item {
@@ -4445,6 +4370,62 @@ input:checked + .slider:before {
     background-color: #a0cfff;
     opacity: 0.6;
     cursor: not-allowed;
+}
+/* ▼▼▼ 动态评论区 - 嵌套回复与交互样式 ▼▼▼ */
+
+.post-footer .reply-indicator {
+    display: none;
+    width: 100%;
+    padding: 6px 10px;
+    margin-bottom: 8px;
+    background-color: #f0f2f5;
+    border-radius: 8px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    justify-content: space-between;
+    align-items: center;
+}
+#phone-screen.dark-mode .post-footer .reply-indicator {
+    background-color: #3a3a3c;
+}
+
+.post-footer .reply-indicator.visible {
+    display: flex;
+}
+
+.post-footer .reply-indicator .cancel-reply-btn {
+    cursor: pointer;
+    font-size: 16px;
+    padding: 2px 5px;
+}
+
+.comment-item {
+    padding: 4px 0;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    border-radius: 4px;
+    padding-left: 5px;
+}
+.comment-item:hover {
+    background-color: #f5f5f5;
+}
+#phone-screen.dark-mode .comment-item:hover {
+    background-color: #3a3a3c;
+}
+
+.comment-item.is-reply {
+    margin-left: 38px;
+    margin-top: 6px;
+    border-left: 2px solid #e0e0e0;
+    padding-left: 8px;
+}
+#phone-screen.dark-mode .comment-item.is-reply {
+    border-left-color: #38383a;
+}
+.comment-item .reply-to-tag {
+    color: var(--text-secondary);
+    font-weight: 500;
+    margin: 0 4px;
 }
     </style>
 </head>
@@ -6267,7 +6248,6 @@ function showScreen(screenId) {
             }
         }
 
-// ▼▼▼ 请用这个【已添加删除按钮】的函数，完整替换掉你旧的 renderQzonePosts 函数 ▼▼▼
 async function renderQzonePosts() {
     const postsListEl = document.getElementById('qzone-posts-list');
     if (!postsListEl) return;
@@ -6331,18 +6311,25 @@ async function renderQzonePosts() {
         let commentsHtml = '';
         if (post.comments && post.comments.length > 0) {
             commentsHtml = '<div class="post-comments-container">';
-            // ★★★★★【核心修改就在这里】★★★★★
-            // 遍历评论时，我们传入 comment 对象本身和它的索引 index
             post.comments.forEach((comment, index) => {
-                // 在评论项的末尾，添加一个带有 data-comment-index 属性的删除按钮
+                const isReply = comment.replyToIndex !== undefined && comment.replyToIndex !== null;
+                let replyTag = '';
+                
+                if (isReply) {
+                    const parentComment = post.comments[comment.replyToIndex];
+                    if (parentComment) {
+                        replyTag = `<span class="reply-to-tag">回复 @${parentComment.commenterName}</span>`;
+                    }
+                }
+
                 commentsHtml += `
-                    <div class="comment-item">
+                    <div class="comment-item ${isReply ? 'is-reply' : ''}" data-comment-index="${index}">
                         <span class="commenter-name">${comment.commenterName}:</span>
+                        ${replyTag}
                         <span class="comment-text">${comment.text}</span>
                         <span class="comment-delete-btn" data-comment-index="${index}">×</span>
                     </div>`;
             });
-            // ★★★★★【修改结束】★★★★★
             commentsHtml += '</div>';
         }
 
@@ -6361,8 +6348,41 @@ async function renderQzonePosts() {
             </div>
             ${likesHtml}
             ${commentsHtml}
-            <div class="post-footer"><div class="comment-section"><img src="${commentAvatar}" class="comment-avatar"><input type="text" class="comment-input" placeholder="友善的评论是交流的起点"><div class="at-mention-popup"></div></div><button class="comment-send-btn">发送</button></div>
+            <div class="post-footer">
+                <div class="reply-indicator">
+                    <span class="reply-indicator-text"></span>
+                    <span class="cancel-reply-btn">×</span>
+                </div>
+                <div class="comment-section">
+                    <img src="${commentAvatar}" class="comment-avatar">
+                    <input type="text" class="comment-input" placeholder="说点什么吧~">
+                    <div class="at-mention-popup"></div>
+                </div>
+                <button class="comment-send-btn">发送</button>
+            </div>
         `;
+        
+        const footer = postEl.querySelector('.post-footer');
+        if (footer) {
+             const replyIndicator = footer.querySelector('.reply-indicator');
+             const cancelReplyBtn = footer.querySelector('.cancel-reply-btn');
+
+             if (cancelReplyBtn && replyIndicator) {
+                cancelReplyBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const postContainer = cancelReplyBtn.closest('.qzone-post-container');
+                    if(postContainer) {
+                        postContainer.dataset.replyToIndex = '';
+                        postContainer.dataset.replyToName = '';
+                    }
+                    replyIndicator.classList.remove('visible');
+                    const commentInput = footer.querySelector('.comment-input');
+                    if (commentInput) {
+                        commentInput.placeholder = '友善的评论是交流的起点';
+                    }
+                });
+            }
+        }
         
         const deleteAction = document.createElement('div');
         deleteAction.className = 'qzone-post-delete-action';
@@ -6417,7 +6437,6 @@ async function renderQzonePosts() {
         commentInput.addEventListener('blur', () => { setTimeout(() => { popup.style.display = 'none'; }, 200); });
     });
 }
-// ▲▲▲ 替换结束 ▲▲▲
              
 // ▼▼▼ 请用下面这个【更新后的】函数，完整替换掉你代码中旧的 displayFilteredFavorites 函数 ▼▼▼
 
@@ -7580,26 +7599,22 @@ else if (msg.type === 'surprise_delivery') {
                 noteText = msg.note || '等待对方处理...';
             }
         }
-    } else { // 消息是 AI 发出的
+    } else {
         if (msg.isRefund) {
-            // AI 的退款（AI 拒收了用户的转账）
             titleText = `退款来自 ${msg.senderName}`;
             noteText = '转账已被拒收';
         } else if (msg.receiverName === myNickname) {
-            // 【核心修正1】这是 AI 主动给用户的转账
             titleText = `转账给 ${myNickname}`;
              if (msg.status === 'accepted') {
                 noteText = '你已收款';
             } else if (msg.status === 'declined') {
                 noteText = '你已拒收';
             } else {
-                // 这是用户需要处理的转账
                 bubble.style.cursor = 'pointer';
                 bubble.dataset.status = 'pending';
                 noteText = msg.note || '点击处理';
             }
         } else {
-            // 【核心修正2】这是 AI 发给群里其他人的转账，对当前用户来说只是一个通知
             titleText = `转账: ${msg.senderName} → ${msg.receiverName}`;
             noteText = msg.note || '群聊内转账';
         }
@@ -7620,16 +7635,12 @@ else if (msg.type === 'surprise_delivery') {
             bubble.classList.add(`status-${msg.status}`);
         }
         let displayName;
-        // 如果是群聊
         if (chat.isGroup) {
-            // 就执行原来的逻辑：在成员列表里查找昵称
             const member = chat.members.find(m => m.originalName === msg.senderName);
             displayName = member ? member.groupNickname : msg.senderName;
         } else {
-            // 否则（是单聊），直接使用聊天对象的名称
             displayName = chat.name;
         }
-        // 【核心修改】使用我们刚刚查找到的 displayName
         const requestTitle = `来自 ${displayName} 的代付请求`;
         let actionButtonsHtml = '';
         if (msg.status === 'pending' && !isUser) {
@@ -7694,7 +7705,6 @@ else if (msg.type === 'surprise_delivery') {
     bubble.classList.add('is-red-packet');
     const myNickname = chat.settings.myNickname || '我';
     
-    // 从最新的 msg 对象中获取状态
     const hasClaimed = msg.claimedBy && msg.claimedBy[myNickname];
     const isFinished = msg.isFullyClaimed;
 
@@ -7702,14 +7712,12 @@ else if (msg.type === 'surprise_delivery') {
     let claimedInfoHtml = '';
     let typeText = '拼手气红包';
 
-    // 1. 判断红包卡片的样式 (颜色)
     if (isFinished) {
         cardClass = 'opened';
     } else if (msg.packetType === 'direct' && Object.keys(msg.claimedBy || {}).length > 0) {
         cardClass = 'opened'; // 专属红包被领了也变灰
     }
     
-    // 2. 判断红包下方的提示文字
     if (msg.packetType === 'direct') {
         typeText = `专属红包: 给 ${msg.receiverName}`;
     }
@@ -7722,7 +7730,6 @@ else if (msg.type === 'surprise_delivery') {
         claimedInfoHtml = `<div class="rp-claimed-info">已被 ${msg.receiverName} 领取</div>`;
     }
 
-    // 3. 拼接最终的HTML，确保onclick调用的是我们注册到全局的函数
     contentHtml = `
         <div class="red-packet-card ${cardClass}">
             <div class="rp-header">
@@ -7733,7 +7740,6 @@ else if (msg.type === 'surprise_delivery') {
             ${claimedInfoHtml}
         </div>
     `;
-// ▲▲▲ 新增结束 ▲▲▲
 
     } else if (msg.type === 'poll') {
     bubble.classList.add('is-poll');
@@ -14611,46 +14617,33 @@ postsList.addEventListener('touchend', handleSwipeEnd);
 postsList.addEventListener('click', async (e) => {
     e.stopPropagation();
     const target = e.target;
+    const postContainer = target.closest('.qzone-post-container');
+    if (!postContainer) return;
 
-    // --- 新增：处理评论删除按钮 ---
+    const postId = parseInt(postContainer.dataset.postId);
+    if (isNaN(postId)) return;
+
+    // --- 1. 处理评论删除 ---
     if (target.classList.contains('comment-delete-btn')) {
-        const postContainer = target.closest('.qzone-post-container');
-        if (!postContainer) return;
-
-        const postId = parseInt(postContainer.dataset.postId);
         const commentIndex = parseInt(target.dataset.commentIndex);
-        if (isNaN(postId) || isNaN(commentIndex)) return;
-
         const post = await db.qzonePosts.get(postId);
         if (!post || !post.comments || !post.comments[commentIndex]) return;
-
-        const commentText = post.comments[commentIndex].text;
-        const confirmed = await showCustomConfirm(
-            '删除评论',
-            `确定要删除这条评论吗？\n\n“${commentText.substring(0, 50)}...”`,
-            { confirmButtonClass: 'btn-danger' }
-        );
-
+        const confirmed = await showCustomConfirm('删除评论', `确定要删除这条评论吗？`, { confirmButtonClass: 'btn-danger' });
         if (confirmed) {
-            // 从数组中移除该评论
             post.comments.splice(commentIndex, 1);
-            // 更新数据库
             await db.qzonePosts.update(postId, { comments: post.comments });
-            // 重新渲染列表以反映更改
             await renderQzonePosts();
-            alert('评论已删除。');
-        }
-        return; // 处理完后直接返回
-    }
-
-    if (target.classList.contains('post-actions-btn')) {
-        const container = target.closest('.qzone-post-container');
-        if (container && container.dataset.postId) {
-            showPostActions(parseInt(container.dataset.postId));
         }
         return;
     }
+    
+    // --- 2. 处理“...”菜单点击 ---
+    if (target.classList.contains('post-actions-btn')) {
+        showPostActions(postId);
+        return;
+    }
 
+    // --- 3. 处理左滑删除 ---
     if (target.closest('.qzone-post-delete-action')) {
         const container = target.closest('.qzone-post-container');
         if (!container) return;
@@ -14666,30 +14659,32 @@ postsList.addEventListener('click', async (e) => {
             container.style.opacity = '0';
         
             setTimeout(async () => {
-		 await db.favorites.where({ type: 'qzone_post', 'content.id': postIdToDelete }).delete();
-                 await db.qzonePosts.delete(postIdToDelete);
+		        await db.favorites.where({ type: 'qzone_post', 'content.id': postIdToDelete }).delete();
+                await db.qzonePosts.delete(postIdToDelete);
                  
-                 const notificationIdentifier = `(ID: ${postIdToDelete})`;
-                 for (const chatId in state.chats) {
-                     const chat = state.chats[chatId];
-                     const originalHistoryLength = chat.history.length;
-                     chat.history = chat.history.filter(msg => !(msg.role === 'system' && msg.content.includes(notificationIdentifier)));
-                     if (chat.history.length < originalHistoryLength) {
-                         await db.chats.put(chat);
-                     }
-                 }
-                 await renderQzonePosts();
-                 alert('动态已删除。');
+                const notificationIdentifier = `(ID: ${postIdToDelete})`;
+                for (const chatId in state.chats) {
+                    const chat = state.chats[chatId];
+                    const originalHistoryLength = chat.history.length;
+                    chat.history = chat.history.filter(msg => !(msg.role === 'system' && msg.content.includes(notificationIdentifier)));
+                    if (chat.history.length < originalHistoryLength) {
+                        await db.chats.put(chat);
+                    }
+                }
+                await renderQzonePosts();
+                alert('动态已删除。');
             }, 300);
         }
         return;
     }
 
+    // --- 4. 处理文字图点击 ---
     if (target.tagName === 'IMG' && target.dataset.hiddenText) {
-        const hiddenText = target.dataset.hiddenText;
-        showCustomAlert("图片内容", hiddenText.replace(/<br>/g, '\n'));
+        showCustomAlert("图片内容", target.dataset.hiddenText.replace(/<br>/g, '\n'));
         return;
     }
+    
+    // --- 5. 处理点赞/收藏 ---
     const icon = target.closest('.action-icon');
     if (icon) {
         const postContainer = icon.closest('.qzone-post-container');
@@ -14728,40 +14723,82 @@ postsList.addEventListener('click', async (e) => {
         return;
     }
 
-const sendBtn = target.closest('.comment-send-btn');
-if (sendBtn) {
-    const postContainer = sendBtn.closest('.qzone-post-container');
-    if (!postContainer) return;
-    const postId = parseInt(postContainer.dataset.postId);
-    const commentInput = postContainer.querySelector('.comment-input');
-    const commentText = commentInput.value.trim();
-    if (!commentText) return alert('评论内容不能为空哦！');
-    
-    const post = await db.qzonePosts.get(postId);
-    if (!post) return;
-    
-    if (!post.comments) post.comments = [];
-    post.comments.push({ commenterName: state.qzoneSettings.nickname, text: commentText, timestamp: Date.now() });
-    await db.qzonePosts.update(postId, { comments: post.comments });
-    
-    if (post.authorId !== 'user' && state.chats[post.authorId]) {
-        const authorChat = state.chats[post.authorId];
-        const notificationMessage = {
-            role: 'system',
-            content: `[系统提示：用户'${state.qzoneSettings.nickname}'刚刚在你的动态(ID: ${postId})下评论说：“${commentText}”。请你对此作出回应。]`,
-            timestamp: Date.now(),
-            isHidden: true
-        };
-        authorChat.history.push(notificationMessage);
-        await db.chats.put(authorChat);
-        console.log(`已向角色“${authorChat.name}”发送评论通知。`);
-		triggerAiResponse(post.authorId);
+    // --- 6. 处理点击评论以进行回复 ---
+    const commentItem = target.closest('.comment-item');
+    if (commentItem) {
+        const commentIndex = parseInt(commentItem.dataset.commentIndex);
+        const post = await db.qzonePosts.get(postId);
+        if (post && post.comments && post.comments[commentIndex]) {
+            const parentComment = post.comments[commentIndex];
+            postContainer.dataset.replyToIndex = commentIndex; // 存储被回复评论的索引
+            postContainer.dataset.replyToName = parentComment.commenterName; // 存储被回复人的名字
+            
+            const footer = postContainer.querySelector('.post-footer');
+            const replyIndicator = footer.querySelector('.reply-indicator');
+            const replyIndicatorText = footer.querySelector('.reply-indicator-text');
+            const commentInput = footer.querySelector('.comment-input');
+            
+            replyIndicatorText.textContent = `回复 @${parentComment.commenterName}:`;
+            replyIndicator.classList.add('visible');
+            commentInput.focus();
+        }
+        return;
     }
+    
+    const sendBtn = target.closest('.comment-send-btn');
+    if (sendBtn) {
+        const commentInput = postContainer.querySelector('.comment-input');
+        const commentText = commentInput.value.trim();
+        if (!commentText) return alert('评论内容不能为空哦！');
 
-    commentInput.value = '';
-    await renderQzonePosts();
-    return;
-}
+        const post = await db.qzonePosts.get(postId);
+        if (!post) return;
+
+        if (!post.comments) post.comments = [];
+        
+        const newComment = { 
+            commenterName: state.qzoneSettings.nickname, 
+            text: commentText, 
+            timestamp: Date.now() 
+        };
+        const replyToIndex = postContainer.dataset.replyToIndex;
+        if (replyToIndex !== '' && replyToIndex !== undefined) {
+            newComment.replyToIndex = parseInt(replyToIndex);
+        }
+
+        const newCommentIndex = post.comments.length;
+        post.comments.push(newComment);
+        await db.qzonePosts.update(postId, { comments: post.comments });
+
+        if (post.authorId !== 'user' && state.chats[post.authorId]) {
+            const authorChat = state.chats[post.authorId];
+            let notificationContent;
+            
+            if (newComment.replyToIndex !== undefined) {
+                const parentComment = post.comments[newComment.replyToIndex];
+                notificationContent = `[系统提示：用户'${state.qzoneSettings.nickname}'刚刚在你的动态(ID: ${postId})中，回复了'${parentComment.commenterName}'的评论：“${parentComment.text}”。用户的回复是：“${commentText}”。请你使用 'qzone_comment' 指令，并设置 'replyToIndex' 为 ${newCommentIndex} 来发表你的评论。]`;
+            } else {
+                notificationContent = `[系统提示：用户'${state.qzoneSettings.nickname}'刚刚在你的动态(ID: ${postId})下评论说：“${commentText}”。请你使用 'qzone_comment' 指令，并设置 'replyToIndex' 为 ${newCommentIndex} 来对此评论进行回复。]`;
+            }
+            
+            const notificationMessage = {
+                role: 'system',
+                content: notificationContent,
+                timestamp: Date.now(),
+                isHidden: true
+            };
+            authorChat.history.push(notificationMessage);
+            await db.chats.put(authorChat);
+            triggerAiResponse(post.authorId);
+        }
+
+        commentInput.value = '';
+        postContainer.dataset.replyToIndex = '';
+        postContainer.dataset.replyToName = '';
+        postContainer.querySelector('.reply-indicator').classList.remove('visible');
+        await renderQzonePosts();
+        return;
+    }
 });
             // ▼▼▼ 在 init() 函数的事件监听器区域，粘贴下面这两行 ▼▼▼
 
