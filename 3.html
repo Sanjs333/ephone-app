@@ -13385,7 +13385,7 @@ async function init() {
     // ▼▼▼ Service Worker 注册与通知权限申请 ▼▼▼
     
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js')
+      navigator.serviceWorker.register('/ephone-app/sw.js')
         .then(reg => console.log('Service Worker 注册成功!', reg))
         .catch(err => console.error('Service Worker 注册失败:', err));
     }
