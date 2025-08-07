@@ -8063,21 +8063,24 @@ let geminiConfig = toGeminiRequestData(model,apiKey,'', messagesForDecision,isGe
 
     // 【核心修改】
 let sharedContext = '';
-// 1. 找到AI上一次说话的位置
+
+const memories = await db.memories.where('chatId').equals(chatId).sortBy('timestamp');
+const recentMemories = memories.slice(-5);
+let memoryContext = '（暂无特别的共同回忆）';
+if (recentMemories.length > 0) {
+memoryContext = recentMemories.map(mem => - ${mem.content.replace(/\n/g, '\n  ')}).join('\n');
+}
+
 const lastAiTurnIndex = chat.history.findLastIndex(msg => msg.role === 'assistant');
 
-// 2. 获取从那时起用户发送的所有新消息
 const recentUserMessages = chat.history.slice(lastAiTurnIndex + 1);
 
-// 3. 在这些新消息中，查找是否存在分享卡片
 const shareCardMessage = recentUserMessages.find(msg => msg.type === 'share_card');
 
-// 4. 如果找到了分享卡片，就构建上下文
 if (shareCardMessage) {
     console.log("检测到分享卡片作为上下文，正在为AI准备...");
     const payload = shareCardMessage.payload;
 
-    // 格式化分享的聊天记录 (这部分逻辑不变)
     const formattedHistory = payload.sharedHistory.map(msg => {
         const sender = msg.senderName || (msg.role === 'user' ? (chat.settings.myNickname || '我') : '未知发送者');
         let contentText = '';
@@ -8087,7 +8090,6 @@ if (shareCardMessage) {
         return `${sender}: ${contentText}`;
     }).join('\n');
 
-    // 构建系统提示 (这部分逻辑不变)
     sharedContext = `
 # 附加上下文：一段分享的聊天记录
 - 重要提示：这不是你和当前用户的对话，而是用户从【另一场】与“${payload.sourceChatName}”的对话中分享过来的。
@@ -8211,13 +8213,6 @@ messagesPayload = historySlice.map(msg => {
     
     return { role: 'user', content: content };
 }).filter(Boolean);
-
-const memories = await db.memories.where('chatId').equals(chatId).sortBy('timestamp');
-const recentMemories = memories.slice(-5);
-let memoryContext = '（暂无特别的共同回忆）'; // 给一个默认值
-if (recentMemories.length > 0) {
-    memoryContext = recentMemories.map(mem => `- ${mem.content.replace(/\n/g, '\n  ')}`).join('\n');
-}
 
         const now = new Date();
         const currentTime = now.toLocaleString('zh-CN', { dateStyle: 'full', timeStyle: 'short' });
@@ -15806,6 +15801,27 @@ document.getElementById('memory-list').addEventListener('click', async (e) => {
     }
 });
 // ▲▲▲ 绑定结束 ▲▲▲
+/**
+ * 【全新添加】根据聊天类型（单聊/群聊）切换显示的通话按钮
+ * @param {boolean} isGroup - 当前聊天是否为群聊
+ */
+function toggleCallButtons(isGroup) {
+    const singleCallBtn = document.getElementById('video-call-btn');
+    const groupCallBtn = document.getElementById('group-video-call-btn');
+
+    if (singleCallBtn && groupCallBtn) {
+        // 如果是群聊，就隐藏单人通话按钮，显示群聊通话按钮
+        if (isGroup) {
+            singleCallBtn.style.display = 'none';
+            groupCallBtn.style.display = 'flex'; // 使用 flex 以便图标居中
+        } 
+        // 否则（是单聊），就反过来
+        else {
+            singleCallBtn.style.display = 'flex';
+            groupCallBtn.style.display = 'none';
+        }
+    }
+}
         // ===================================================================
         // 5. 启动！
             
