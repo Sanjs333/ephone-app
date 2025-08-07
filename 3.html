@@ -7816,14 +7816,12 @@ return wrapper;
 
 const loadMoreBtn = document.getElementById('load-more-btn'); if (loadMoreBtn) { messagesContainer.insertBefore(messageEl, loadMoreBtn.nextSibling); } else { messagesContainer.prepend(messageEl); } }
 
-// ▼▼▼ 用这个【带动画的版本】替换你原来的 appendMessage 函数 ▼▼▼
 function appendMessage(msg, chat, isInitialLoad = false) {
     const messagesContainer = document.getElementById('chat-messages');
     const messageEl = createMessageElement(msg, chat);
 
-    if (!messageEl) return; // 如果消息是隐藏的，则不处理
+    if (!messageEl) return;
 
-    // 【核心】只对新消息添加动画，不对初始加载的消息添加
     if (!isInitialLoad) {
         messageEl.classList.add('animate-in');
     }
@@ -7836,7 +7834,22 @@ function appendMessage(msg, chat, isInitialLoad = false) {
         currentRenderedCount++;
     }
 }
-// ▲▲▲ 替换结束 ▲▲▲
+
+function toggleCallButtons(isGroup) {
+    const singleCallBtn = document.getElementById('video-call-btn');
+    const groupCallBtn = document.getElementById('group-video-call-btn');
+
+    if (singleCallBtn && groupCallBtn) {
+        if (isGroup) {
+            singleCallBtn.style.display = 'none';
+            groupCallBtn.style.display = 'flex';
+        } 
+        else {
+            singleCallBtn.style.display = 'flex';
+            groupCallBtn.style.display = 'none';
+        }
+    }
+}
 
 async function openChat(chatId) {
     state.activeChatId = chatId;
@@ -15801,27 +15814,6 @@ document.getElementById('memory-list').addEventListener('click', async (e) => {
     }
 });
 // ▲▲▲ 绑定结束 ▲▲▲
-/**
- * 【全新添加】根据聊天类型（单聊/群聊）切换显示的通话按钮
- * @param {boolean} isGroup - 当前聊天是否为群聊
- */
-function toggleCallButtons(isGroup) {
-    const singleCallBtn = document.getElementById('video-call-btn');
-    const groupCallBtn = document.getElementById('group-video-call-btn');
-
-    if (singleCallBtn && groupCallBtn) {
-        // 如果是群聊，就隐藏单人通话按钮，显示群聊通话按钮
-        if (isGroup) {
-            singleCallBtn.style.display = 'none';
-            groupCallBtn.style.display = 'flex'; // 使用 flex 以便图标居中
-        } 
-        // 否则（是单聊），就反过来
-        else {
-            singleCallBtn.style.display = 'flex';
-            groupCallBtn.style.display = 'none';
-        }
-    }
-}
         // ===================================================================
         // 5. 启动！
             
