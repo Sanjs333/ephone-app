@@ -1,6 +1,6 @@
 {
-  "name": "♥Phone",
-  "short_name": "♥Phone",
+  "name": "🤍Phone",
+  "short_name": "🤍Phone",
   "start_url": ".",
   "display": "fullscreen",
   "background_color": "#000000",
@@ -18,4 +18,5 @@
       "type": "image/jpeg"
     }
   ]
+
 }
