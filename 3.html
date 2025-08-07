@@ -9948,43 +9948,41 @@ ${worldBookContent}
                 renderChatList();
                 console.log(`后台活动: 角色 "${chat.name}" 主动发送了消息: ${aiMessage.content}`);
             }
-			
-if (action.type === 'qzone_post') {
-    const newPost = { 
-        type: action.postType, 
-        content: action.content || '', 
-        publicText: action.publicText || '', 
-        hiddenContent: action.hiddenContent || '', 
-        timestamp: Date.now(), 
-        authorId: chatId, 
-        authorGroupId: chat.groupId,
-        visibleGroupIds: action.visibleGroupIds || null
-    };
-    const newPostId = await db.qzonePosts.add(newPost);
-
-    const postAuthorName = chat.name;
-    const postSummary = (newPost.publicText || newPost.content || newPost.hiddenContent || "图片动态").substring(0, 30) + '...';
-    
-    showNotification(chatId, `[好友动态] 发布了一条新动态: “${postSummary}”`);
-    updateUnreadIndicator(unreadPostsCount + 1);
-
-    for (const otherChatId in state.chats) {
-        if (otherChatId === chatId || state.chats[otherChatId].isGroup) continue;
-        const otherChat = state.chats[otherChatId];
-        if (filterVisiblePostsForAI([newPost], otherChat).length > 0) {
-            const historyMessage = {
-                role: 'system',
-                content: `[系统提示：'${postAuthorName}'刚刚发布了一条动态(ID: ${newPostId})，内容摘要是：“${postSummary}”。]`,
-                timestamp: Date.now(),
-                isHidden: true
-            };
-            otherChat.history.push(historyMessage);
-            await db.chats.put(otherChat);
-        }
-    }
-    
-    console.log(`后台活动: 角色 "${chat.name}" 发布了动态`);
-}
+            if (action.type === 'qzone_post') {
+                const newPost = { 
+                    type: action.postType, 
+                    content: action.content || '', 
+                    publicText: action.publicText || '', 
+                    hiddenContent: action.hiddenContent || '', 
+                    timestamp: Date.now(), 
+                    authorId: chatId, 
+                    authorGroupId: chat.groupId,
+                    visibleGroupIds: action.visibleGroupIds || null
+                };
+                const newPostId = await db.qzonePosts.add(newPost);
+        
+                const postAuthorName = chat.name;
+                const postSummary = (newPost.publicText || newPost.content || newPost.hiddenContent || "图片动态").substring(0, 30) + '...';
+                
+                showNotification(chatId, `[好友动态] 发布了一条新动态: “${postSummary}”`);
+                updateUnreadIndicator(unreadPostsCount + 1);
+        
+                for (const otherChatId in state.chats) {
+                    if (otherChatId === chatId || state.chats[otherChatId].isGroup) continue;
+                    const otherChat = state.chats[otherChatId];
+                    if (filterVisiblePostsForAI([newPost], otherChat).length > 0) {
+                        const historyMessage = {
+                            role: 'system',
+                            content: `[系统提示：'${postAuthorName}'刚刚发布了一条动态(ID: ${newPostId})，内容摘要是：“${postSummary}”。]`,
+                            timestamp: Date.now(),
+                            isHidden: true
+                        };
+                        otherChat.history.push(historyMessage);
+                        await db.chats.put(otherChat);
+                    }
+                }
+                
+                console.log(`后台活动: 角色 "${chat.name}" 发布了动态`);
             } else if (action.type === 'qzone_comment') {
                 const post = await db.qzonePosts.get(parseInt(action.postId));
                 if (post) {
@@ -10015,6 +10013,7 @@ if (action.type === 'qzone_post') {
                 }
             }
         }
+
     } catch (error) {
         console.error(`角色 "${chat.name}" 的独立行动失败:`, error);
     }
