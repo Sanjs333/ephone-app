@@ -6144,23 +6144,32 @@ db.version(24).stores({
         // 3. 所有功能函数定义
         // ===================================================================
 
-        function showScreen(screenId) {
-            if (screenId === 'chat-list-screen') {
-                window.renderChatListProxy(); 
-                switchToChatListView('messages-view');
-            }
-            if (screenId === 'api-settings-screen') window.renderApiSettingsProxy();
-            if (screenId === 'wallpaper-screen') window.renderWallpaperScreenProxy();
-            if (screenId === 'world-book-screen') window.renderWorldBookScreenProxy();
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            const screenToShow = document.getElementById(screenId);
-            if (screenToShow) screenToShow.classList.add('active');
-            if (screenId === 'chat-interface-screen') window.updateListenTogetherIconProxy(state.activeChatId);
-            if (screenId === 'font-settings-screen') {
-                document.getElementById('font-url-input').value = state.globalSettings.fontUrl || '';
-                applyCustomFont(state.globalSettings.fontUrl || '', true);
-            }
-        }
+function showScreen(screenId) {
+    const currentActiveScreen = document.querySelector('.screen.active');
+    if (currentActiveScreen && currentActiveScreen.id === screenId) {
+        return;
+    }
+    
+    if (screenId === 'chat-list-screen') {
+        window.renderChatListProxy(); 
+        switchToChatListView('messages-view');
+    }
+    if (screenId === 'api-settings-screen') window.renderApiSettingsProxy();
+    if (screenId === 'wallpaper-screen') window.renderWallpaperScreenProxy();
+    if (screenId === 'world-book-screen') window.renderWorldBookScreenProxy();
+    
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    const screenToShow = document.getElementById(screenId);
+    if (screenToShow) screenToShow.classList.add('active');
+    
+    if (screenId === 'chat-interface-screen') window.updateListenTogetherIconProxy(state.activeChatId);
+    if (screenId === 'font-settings-screen') {
+        document.getElementById('font-url-input').value = state.globalSettings.fontUrl || '';
+        applyCustomFont(state.globalSettings.fontUrl || '', true);
+    }
+
+    history.pushState({ screen: screenId }, `EPhone - ${screenId}`, `#${screenId}`);
+}
         window.updateListenTogetherIconProxy = () => {};
 
         function switchToChatListView(viewId) {
@@ -6169,28 +6178,24 @@ db.version(24).stores({
                 'messages-view': document.getElementById('messages-view'),
                 'qzone-screen': document.getElementById('qzone-screen'),
                 'favorites-view': document.getElementById('favorites-view'),
-        'memories-view': document.getElementById('memories-view') // <-- 新增这一行
+        'memories-view': document.getElementById('memories-view')
     };
             const mainHeader = document.getElementById('main-chat-list-header');
-            const mainBottomNav = document.getElementById('chat-list-bottom-nav'); // 获取主导航栏
+            const mainBottomNav = document.getElementById('chat-list-bottom-nav');
 
             if (isFavoritesSelectionMode) {
                 document.getElementById('favorites-edit-btn').click(); 
             }
 
-            // 隐藏所有视图
             Object.values(views).forEach(v => v.classList.remove('active'));
-            // 显示目标视图
             if (views[viewId]) {
                 views[viewId].classList.add('active');
             }
 
-            // 更新底部导航栏高亮
             document.querySelectorAll('#chat-list-bottom-nav .nav-item').forEach(item => {
                 item.classList.toggle('active', item.dataset.view === viewId);
             });
             
-            // ▼▼▼ 【核心修正】在这里统一管理所有UI元素的显隐 ▼▼▼
             if (viewId === 'messages-view') {
                 mainHeader.style.display = 'flex';
                 mainBottomNav.style.display = 'flex';
@@ -6198,7 +6203,6 @@ db.version(24).stores({
                 mainHeader.style.display = 'none';
                 mainBottomNav.style.display = 'none';
             }
-            // ▲▲▲ 修正结束 ▲▲▲
 
     if (viewId !== 'memories-view') {
         activeCountdownTimers.forEach(timerId => clearInterval(timerId));
@@ -6838,7 +6842,35 @@ state.globalSettings.appIcons = { ...DEFAULT_APP_ICONS, ...(state.globalSettings
 
         function formatTimestamp(timestamp) { if (!timestamp) return ''; const date = new Date(timestamp); const hours = String(date.getHours()).padStart(2, '0'); const minutes = String(date.getMinutes()).padStart(2, '0'); return `${hours}:${minutes}`; }
 
-        function showNotification(chatId, messageContent) { clearTimeout(notificationTimeout); const chat = state.chats[chatId]; if (!chat) return; const bar = document.getElementById('notification-bar'); document.getElementById('notification-avatar').src = chat.settings.aiAvatar || chat.settings.groupAvatar || defaultAvatar; document.getElementById('notification-content').querySelector('.name').textContent = chat.name; document.getElementById('notification-content').querySelector('.message').textContent = messageContent; const newBar = bar.cloneNode(true); bar.parentNode.replaceChild(newBar, bar); newBar.addEventListener('click', () => { openChat(chatId); newBar.classList.remove('visible'); }); newBar.classList.add('visible'); notificationTimeout = setTimeout(() => { newBar.classList.remove('visible'); }, 4000); }
+function showNotification(chatId, messageContent) {
+    clearTimeout(notificationTimeout);
+    
+    const chat = state.chats[chatId];
+    if (!chat) return;
+
+    const title = chat.isGroup ? `${chat.name} (群聊)` : chat.name;
+    const bodyText = chat.isGroup ? `${chat.history.slice(-1)[0]?.senderName}: ${messageContent}` : messageContent;
+    const iconUrl = chat.settings.aiAvatar || chat.settings.groupAvatar || defaultAvatar;
+
+    if ('serviceWorker' in navigator && navigator.serviceWorker.controller && Notification.permission === 'granted') {
+        navigator.serviceWorker.controller.postMessage({
+            type: 'show-notification',
+            title: title,
+            body: bodyText,
+            icon: iconUrl
+        });
+    } else {
+        const bar = document.getElementById('notification-bar');
+        const newBar = bar.cloneNode(true);
+        newBar.querySelector('#notification-avatar').src = iconUrl;
+        newBar.querySelector('#notification-content .name').textContent = title;
+        newBar.querySelector('#notification-content .message').textContent = bodyText;
+        bar.parentNode.replaceChild(newBar, bar);
+        newBar.addEventListener('click', () => { openChat(chatId); newBar.classList.remove('visible'); });
+        newBar.classList.add('visible');
+        notificationTimeout = setTimeout(() => { newBar.classList.remove('visible'); }, 4000);
+    }
+}
 
         function updateClock() { const now = new Date(); const timeString = now.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }); const dateString = now.toLocaleDateString('zh-CN', { weekday: 'long', month: 'long', day: 'numeric' }); document.getElementById('main-time').textContent = timeString; document.getElementById('status-bar-time').textContent = timeString; document.getElementById('main-date').textContent = dateString; }
 
@@ -7860,6 +7892,7 @@ async function openChat(chatId) {
     if (chat.unreadCount > 0) {
         chat.unreadCount = 0;
         await db.chats.put(chat);
+        updateAppBadgeAndTitle();
 	renderChatList();
     }
 
@@ -7882,19 +7915,13 @@ async function triggerAiResponse() {
     const chat = state.chats[state.activeChatId];
 
 const chatHeaderTitle = document.getElementById('chat-header-title');
-
-    // ★★★★★【核心修改1：获取群聊的输入提示元素】★★★★★
     const typingIndicator = document.getElementById('typing-indicator');
-
-    // ★★★★★【核心修改2：根据聊天类型，决定显示哪种“正在输入”】★★★★★
     if (chat.isGroup) {
-        // 如果是群聊，显示输入框上方的提示条
         if (typingIndicator) {
             typingIndicator.textContent = '成员们正在输入...';
             typingIndicator.style.display = 'block';
         }
     } else {
-        // 如果是单聊，保持原来的标题动画
         if (chatHeaderTitle) {
             chatHeaderTitle.style.opacity = 0;
             setTimeout(() => {
@@ -7909,7 +7936,6 @@ const chatHeaderTitle = document.getElementById('chat-header-title');
         const { proxyUrl, apiKey, model } = state.apiConfig;
         if (!proxyUrl || !apiKey || !model) {
             alert('请先在API设置中配置反代地址、密钥并选择模型。');
-            // ★★★★★【核心修改3：无论成功失败，都要隐藏输入提示】★★★★★
             if (chat.isGroup) {
                 if (typingIndicator) typingIndicator.style.display = 'none';
             } else {
@@ -7935,7 +7961,6 @@ const chatHeaderTitle = document.getElementById('chat-header-title');
                 })
                 .join('\n');
 
-            // 2. 【全新指令】构建一个强制AI给出理由的Prompt
             const decisionPrompt = `
 # 你的任务
 你现在是角色“${chat.name}”。用户之前被你拉黑了，现在TA向你发送了好友申请，希望和好。
@@ -9882,6 +9907,7 @@ ${worldBookContent}
                 chat.history.push(aiMessage);
                 await db.chats.put(chat);
                 showNotification(chatId, aiMessage.content);
+                updateAppBadgeAndTitle();
                 renderChatList();
                 console.log(`后台活动: 角色 "${chat.name}" 主动发送了消息: ${aiMessage.content}`);
             }
@@ -9898,6 +9924,7 @@ ${worldBookContent}
                 };
                 await db.qzonePosts.add(newPost);
                 updateUnreadIndicator(unreadPostsCount + 1);
+                showNotification(chatId, `[好友动态] ${chat.name} 发布了一条新动态`);
                 console.log(`后台活动: 角色 "${chat.name}" 发布了动态`);
             } else if (action.type === 'qzone_comment') {
                 const post = await db.qzonePosts.get(parseInt(action.postId));
@@ -9906,6 +9933,7 @@ ${worldBookContent}
                     post.comments.push({ commenterName: chat.name, text: action.commentText, timestamp: Date.now() });
                     await db.qzonePosts.update(post.id, { comments: post.comments });
                     updateUnreadIndicator(unreadPostsCount + 1);
+                    showNotification(chatId, `[好友动态] ${chat.name} 评论了你的动态`);
                     console.log(`后台活动: 角色 "${chat.name}" 评论了动态 #${post.id}`);
                 }
             } else if (action.type === 'qzone_like') {
@@ -13301,14 +13329,12 @@ async function editMemory(memoryId) {
     await renderMemoryList(); // 刷新列表
 }
 
-// ▲▲▲ 新函数粘贴结束 ▲▲▲
-// ▼▼▼ 【全新】“拆开礼物”核心逻辑函数 ▼▼▼
+// ▼▼▼ “拆开礼物”核心逻辑函数 ▼▼▼
 async function handleOpenGift(timestamp) {
     const chat = state.chats[state.activeChatId];
     const message = chat.history.find(m => m.timestamp === timestamp);
     if (!message || message.type !== 'surprise_delivery') return;
 
-    // 1. 播放卡片晃动动画，增加趣味性
     const cardElement = document.querySelector(`.message-bubble[data-timestamp="${timestamp}"] .surprise-delivery-card`);
     if (cardElement) {
         cardElement.classList.add('gift-received-animation');
@@ -13317,13 +13343,11 @@ async function handleOpenGift(timestamp) {
         }, { once: true });
     }
     
-    // 2. 弹出礼物详情
     await showCustomAlert(
         `来自 ${message.senderName} 的礼物！`, 
         `你收到了 **${message.item_name}**！\n\nTA说：“${message.reason || '希望你能喜欢。'}”`
     );
 
-    // 3. 【关键】创建一条对AI可见的隐藏消息，告诉它你已经“收到”了
     const hiddenMessage = {
         role: 'system',
         content: `[系统提示：用户刚刚拆开了你送的礼物（${message.item_name}）。请你对此作出回应，可以问问TA是否喜欢，或者聊聊相关的话题。]`,
@@ -13332,38 +13356,71 @@ async function handleOpenGift(timestamp) {
     };
     chat.history.push(hiddenMessage);
     
-    // 4. 保存并触发AI的后续反应
     await db.chats.put(chat);
     triggerAiResponse();
 }
-// ▲▲▲ 新函数粘贴结束 ▲▲▲
+// ▼▼▼ 更新App角标和页面标题的统一函数 ▼▼▼
+function updateAppBadgeAndTitle() {
+    const totalUnreadCount = Object.values(state.chats).reduce((sum, chat) => sum + (chat.unreadCount || 0), 0);
+    
+    // 更新网页标题（用于PC端和后台切换时查看）
+    if (totalUnreadCount > 0) {
+        document.title = `(${totalUnreadCount}) EPhone`;
+    } else {
+        document.title = "EPhone";
+    }
+
+    // 更新App图标角标（用于手机主屏幕）
+    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage({
+            type: 'update-badge',
+            count: totalUnreadCount
+        });
+    }
+}
         // ===================================================================
         // 4. 初始化函数 init()
         // ===================================================================
-async function init() { // <-- 【核心修复】在这里加上 async
+async function init() {
+    // ▼▼▼ Service Worker 注册与通知权限申请 ▼▼▼
+    
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js')
+        .then(reg => console.log('Service Worker 注册成功!', reg))
+        .catch(err => console.error('Service Worker 注册失败:', err));
+    }
 
-    // ▼▼▼ 在 init() 函数的【最开头】，粘贴下面这两行代码 ▼▼▼
+    function requestNotificationPermission() {
+        if ('Notification' in window && Notification.permission !== 'granted') {
+          Notification.requestPermission().then(permission => {
+            if (permission === 'granted') {
+              console.log('通知权限已获取！');
+            }
+          });
+        }
+    }
+    requestNotificationPermission();
+
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+        Object.values(state.chats).forEach(chat => chat.unreadCount = 0);
+        updateAppBadgeAndTitle();
+    }
+});
+
     const savedTheme = localStorage.getItem('ephone-theme') || 'light'; // 默认为日间模式
     applyTheme(savedTheme);
-    // ▲▲▲ 粘贴结束 ▲▲▲
 
-    // ▼▼▼ 新增代码 ▼▼▼
     const customBubbleStyleTag = document.createElement('style');
     customBubbleStyleTag.id = 'custom-bubble-style';
     document.head.appendChild(customBubbleStyleTag);
-    // ▲▲▲ 新增结束 ▲▲▲
 
-    // ▼▼▼ 新增代码 ▼▼▼
     const previewBubbleStyleTag = document.createElement('style');
     previewBubbleStyleTag.id = 'preview-bubble-style';
     document.head.appendChild(previewBubbleStyleTag);
-    // ▲▲▲ 新增结束 ▲▲▲
 
-
-    // ▼▼▼ 修改这两行 ▼▼▼
-    applyScopedCss('', '#chat-messages', 'custom-bubble-style'); // 清除真实聊天界面的自定义样式
-    applyScopedCss('', '#settings-preview-area', 'preview-bubble-style'); // 清除预览区的自定义样式
-    // ▲▲▲ 修改结束 ▲▲▲
+    applyScopedCss('', '#chat-messages', 'custom-bubble-style');
+    applyScopedCss('', '#settings-preview-area', 'preview-bubble-style');
 
             window.showScreen = showScreen;
             window.renderChatListProxy = renderChatList;
@@ -13371,13 +13428,11 @@ async function init() { // <-- 【核心修复】在这里加上 async
             window.renderWallpaperScreenProxy = renderWallpaperScreen;
             window.renderWorldBookScreenProxy = renderWorldBookScreen;
 
-            await loadAllDataFromDB(); // <--- 【核心修复】确保这里的 await 能正常工作
+            await loadAllDataFromDB();
 
-            // 初始化未读动态计数
             const storedCount = parseInt(localStorage.getItem('unreadPostsCount')) || 0;
             updateUnreadIndicator(storedCount);
-            
-            // ▲▲▲ 代码添加结束 ▲▲▲
+
 
             if (state.globalSettings && state.globalSettings.fontUrl) {
                 applyCustomFont(state.globalSettings.fontUrl);
@@ -15741,19 +15796,13 @@ document.querySelector('.progress-bar').addEventListener('click', (e) => {
     audioPlayer.currentTime = (clickX / barWidth) * audioPlayer.duration;
 });
 
-// ▼▼▼ 在 init() 函数的事件监听器区域，粘贴这段新代码 ▼▼▼
-
-// 使用事件委托来处理所有“已撤回消息”的点击事件
 document.getElementById('chat-messages').addEventListener('click', (e) => {
-    // 检查被点击的元素或其父元素是否是“已撤回”提示
     const placeholder = e.target.closest('.recalled-message-placeholder');
-    if (!placeholder) return; // 如果不是，就退出
+    if (!placeholder) return;
 
-    // 如果是，就从聊天记录中找到对应的数据并显示
     const chat = state.chats[state.activeChatId];
-    const wrapper = placeholder.closest('.message-wrapper'); // 找到它的父容器
+    const wrapper = placeholder.closest('.message-wrapper');
     if (chat && wrapper) {
-        // 从父容器上找到时间戳
         const timestamp = parseInt(wrapper.dataset.timestamp);
         const recalledMsg = chat.history.find(m => m.timestamp === timestamp);
         
@@ -15771,13 +15820,10 @@ document.getElementById('chat-messages').addEventListener('click', (e) => {
     }
 });
 
-// ▲▲▲ 新代码粘贴结束 ▲▲▲
-
-// ▼▼▼ 在 init() 的事件监听器区域，粘贴这段新代码 ▼▼▼
 document.getElementById('manage-world-book-categories-btn').addEventListener('click', openCategoryManager);
 document.getElementById('close-category-manager-btn').addEventListener('click', () => {
     document.getElementById('world-book-category-manager-modal').classList.remove('visible');
-    renderWorldBookScreen(); // 关闭后刷新主列表
+    renderWorldBookScreen();
 });
 document.getElementById('add-new-category-btn').addEventListener('click', addNewCategory);
 document.getElementById('existing-categories-list').addEventListener('click', (e) => {
@@ -15786,8 +15832,7 @@ document.getElementById('existing-categories-list').addEventListener('click', (e
         deleteCategory(categoryId);
     }
 });
-// ▲▲▲ 新代码粘贴结束 ▲▲▲
-// ▼▼▼ 【全新】“记忆小本”功能事件绑定 ▼▼▼
+// ▼▼▼ “记忆小本”功能事件绑定 ▼▼▼
 document.getElementById('manage-memory-btn').addEventListener('click', () => {
     openMemoryBook(state.activeChatId);
 });
@@ -15808,7 +15853,27 @@ document.getElementById('memory-list').addEventListener('click', async (e) => {
         editMemory(parseInt(memoryItem.dataset.memoryId));
     }
 });
-// ▲▲▲ 绑定结束 ▲▲▲
+// ▼▼▼安卓返回键适配功能 ▼▼▼
+window.addEventListener('popstate', (event) => {
+    // 当用户点击返回键时，这个事件会被触发
+    if (event.state && event.state.screen) {
+        // 如果历史记录里有我们存的屏幕信息，就直接显示那个屏幕
+        // 注意：这里我们直接调用内部切换逻辑，但不再次推入历史记录，避免循环
+        const screenId = event.state.screen;
+        
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        const screenToShow = document.getElementById(screenId);
+        if (screenToShow) screenToShow.classList.add('active');
+
+    } else {
+        // 如果历史记录是空的（比如刚打开页面），就默认回到主屏幕
+        const homeScreen = document.getElementById('home-screen');
+        if (homeScreen && !homeScreen.classList.contains('active')) {
+             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+             homeScreen.classList.add('active');
+        }
+    }
+});
         // ===================================================================
         // 5. 启动！
             
