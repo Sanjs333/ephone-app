@@ -5963,6 +5963,8 @@ if (Array.isArray(res)) {
         // --- 已修正 ---
         let state = { chats: {}, activeChatId: null, globalSettings: {}, apiConfig: {}, userStickers: [], worldBooks: [], personaPresets: [], qzoneSettings: {}, activeAlbumId: null };
         // --- 修正结束 ---
+let allFavoriteItems = [];
+let needsUpdate = false;
 let musicState = { 
     isActive: false, 
     activeChatId: null, 
@@ -9948,7 +9950,7 @@ ${worldBookContent}
                 renderChatList();
                 console.log(`后台活动: 角色 "${chat.name}" 主动发送了消息: ${aiMessage.content}`);
             }
-            if (action.type === 'qzone_post') {
+            if (action.type === 'qzone_post') { // 【注意】这里的 if 后面没有多余的括号了
                 const newPost = { 
                     type: action.postType, 
                     content: action.content || '', 
@@ -13944,7 +13946,7 @@ worldBookCheckboxesContainer.addEventListener('change', (e) => {
     document.getElementById('chat-settings-modal').classList.add('visible');
 });
 // ▲▲▲ 替换结束 ▲▲▲
-            
+	
 function renderGroupMemberSettings(members) { 
     const container = document.getElementById('group-members-settings'); 
     container.innerHTML = ''; 
@@ -13959,7 +13961,7 @@ function renderGroupMemberSettings(members) {
         container.appendChild(div); 
     }); 
 }
-
+	
 function openMemberEditor(memberId) { 
     editingMemberId = memberId; 
     const chat = state.chats[state.activeChatId]; 
@@ -14746,7 +14748,7 @@ if (sendBtn) {
     await renderQzonePosts();
     return;
 }
-
+});
             // ▼▼▼ 在 init() 函数的事件监听器区域，粘贴下面这两行 ▼▼▼
 
             // 绑定动态页和收藏页的返回按钮
@@ -15942,13 +15944,17 @@ if ('serviceWorker' in navigator) {
         }
     });
 }
-        // ===================================================================
+
+         // ===================================================================
         // 5. 启动！
+        // ===================================================================
             
             showScreen('home-screen');
+
         }
 
         init();
+
     });
 </script>
 </body>
