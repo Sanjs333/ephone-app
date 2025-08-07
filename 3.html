@@ -9767,7 +9767,7 @@ function runBackgroundSimulationTick() {
                 triggerAiFriendApplication(chat.id);
             }
         }
-        else if (chat.relationship?.status === 'friend' && chat.id !== state.activeChatId) {
+        else if (chat.relationship?.status === 'friend' && (chat.id !== state.activeChatId || document.visibilityState === 'hidden')) {
             if (Math.random() < 0.20) { // 摇骰子逻辑保持不变
                 console.log(`角色 "${chat.name}" 被唤醒，准备独立行动...`);
                 triggerInactiveAiAction(chat.id);
