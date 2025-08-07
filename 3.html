@@ -9883,7 +9883,9 @@ ${worldBookContent}
         const data = await response.json();
         
         // 检查是否有有效回复
-        const aiResponseContent = isGemini ? data.candidates[0]?.content?.parts[0]?.text : data.choices[0]?.message?.content;
+        const aiResponseContent = isGemini 
+            ? (data.candidates && data.candidates.length > 0 ? data.candidates[0]?.content?.parts[0]?.text : null) 
+            : data.choices[0]?.message?.content;
         if (!aiResponseContent) {
             console.warn(`API为空回或格式不正确，角色 "${chat.name}" 的本次后台活动跳过。`, data);
             return;
@@ -11659,16 +11661,12 @@ ${contextSummary}
 
             const data = await response.json();
 
-            // --- 【核心修正：在这里净化AI的回复】 ---
-            let rawContent = isGemini? data.candidates[0].content.parts[0].text : data.choices[0].message.content;
-            // 1. 移除头尾可能存在的 "```json" 和 "```"
+            let rawContent = isGemini
+                ? (data.candidates && data.candidates.length > 0 ? data.candidates[0]?.content?.parts[0]?.text : null)
+                : data.choices[0].message.content;
             rawContent = rawContent.replace(/^```json\s*/, '').replace(/```$/, '');
-            // 2. 移除所有换行符和多余的空格，确保是一个干净的JSON字符串
-            const cleanedContent = rawContent.trim();
-
-            // 3. 使用净化后的内容进行解析
+            const cleanedContent = rawContent.trim();  
             const responseObj = JSON.parse(cleanedContent);
-            // --- 【修正结束】 ---
 
         if (responseObj.decision === 'apply' && responseObj.reason) {
             chat.relationship.status = 'pending_user_approval';
