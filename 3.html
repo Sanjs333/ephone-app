@@ -7924,9 +7924,9 @@ async function openChat(chatId) {
 }
 
 async function triggerAiResponse(chatIdOverride = null) {
-    if (!state.activeChatId) return;
-    const chatId = state.activeChatId;
-    const chat = state.chats[state.activeChatId];
+    const chatId = chatIdOverride || state.activeChatId;
+    if (!chatId) return;
+    const chat = state.chats[chatId];
 
 const chatHeaderTitle = document.getElementById('chat-header-title');
     const typingIndicator = document.getElementById('typing-indicator');
