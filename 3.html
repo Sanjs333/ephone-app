@@ -8536,6 +8536,14 @@ if (visiblePosts.length > 0 && !chat.isGroup) {
                 throw new Error(errorMsg);
             }
             const data = await response.json();
+		            if (isGemini && (!data.candidates || data.candidates.length === 0)) {  
+                const errorMessage = data.error ? data.error.message : "Gemini API 返回了空的或无效的响应。";
+                throw new Error(errorMessage);
+            }
+		            if (!isGemini && (!data.choices || data.choices.length === 0)) {
+                const errorMessage = data.error ? data.error.message : "API 返回了空的或无效的响应（可能是Key错误或余额不足）。";
+                throw new Error(errorMessage);
+            }
             const aiResponseContent = isGemini? data.candidates[0].content.parts[0].text : data.choices[0].message.content;
             console.log(`AI '${chat.name}' 的原始回复:`, aiResponseContent);
 
