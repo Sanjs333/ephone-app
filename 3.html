@@ -7923,7 +7923,7 @@ async function openChat(chatId) {
     document.getElementById('send-poll-btn').style.display = chat.isGroup ? 'flex' : 'none';
 }
 
-async function triggerAiResponse() {
+async function triggerAiResponse(chatIdOverride = null) {
     if (!state.activeChatId) return;
     const chatId = state.activeChatId;
     const chat = state.chats[state.activeChatId];
@@ -14742,6 +14742,7 @@ if (sendBtn) {
         authorChat.history.push(notificationMessage);
         await db.chats.put(authorChat);
         console.log(`已向角色“${authorChat.name}”发送评论通知。`);
+		triggerAiResponse(post.authorId);
     }
 
     commentInput.value = '';
