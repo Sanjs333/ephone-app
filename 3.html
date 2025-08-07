@@ -5871,7 +5871,7 @@ input:checked + .slider:before {
                     return [{text:`${time}[${text[obj.status]}] ${obj.status === 'paid' ? '同意' : '拒绝'}`}]
                 }else if(itemType === 'video_call_request'){
                     return [{text:`${time}[${text}]`}]
-                }}else if(itemType === 'video_call_request'){
+                }else if(itemType === 'video_call_request'){
                     return [{text:`${time}[${text[obj.decision]}] ${obj.decision === 'accept' ? '同意' : '拒绝'}`}]
                 }else if(itemType === 'qzone_post'){
                     return [{text:`${time}[${text[obj.postType]}] ${obj.postType === 'shuoshuo' ? `${obj.content}` : `图片描述是:${obj.hiddenContent} ${obj.publicText ? `文案是: ${obj.publicText}` : ''}`}`}]
