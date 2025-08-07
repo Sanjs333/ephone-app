@@ -4388,44 +4388,34 @@ input:checked + .slider:before {
 #phone-screen.dark-mode .post-footer .reply-indicator {
     background-color: #3a3a3c;
 }
-
 .post-footer .reply-indicator.visible {
     display: flex;
 }
-
 .post-footer .reply-indicator .cancel-reply-btn {
     cursor: pointer;
     font-size: 16px;
     padding: 2px 5px;
 }
 
-.comment-item {
-    padding: 4px 0;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    border-radius: 4px;
-    padding-left: 5px;
-}
-.comment-item:hover {
-    background-color: #f5f5f5;
-}
-#phone-screen.dark-mode .comment-item:hover {
-    background-color: #3a3a3c;
-}
-
 .comment-item.is-reply {
     margin-left: 38px;
     margin-top: 6px;
-    border-left: 2px solid #e0e0e0;
-    padding-left: 8px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    background-color: #f0f2f5;
 }
 #phone-screen.dark-mode .comment-item.is-reply {
-    border-left-color: #38383a;
+    background-color: #3a3a3c;
 }
-.comment-item .reply-to-tag {
-    color: var(--text-secondary);
-    font-weight: 500;
-    margin: 0 4px;
+
+.comment-section {
+    align-items: flex-end;
+}
+.comment-section .comment-image-btn {
+    width: 36px;
+    height: 36px;
+    margin: 0 5px;
+    flex-shrink: 0;
 }
     </style>
 </head>
@@ -6385,7 +6375,7 @@ if (post.comments && post.comments.length > 0) {
                     replyIndicator.classList.remove('visible');
                     const commentInput = footer.querySelector('.comment-input');
                     if (commentInput) {
-                        commentInput.placeholder = '友善的评论是交流的起点';
+                        commentInput.placeholder = '说点什么吧~';
                     }
                 });
             }
@@ -14824,26 +14814,27 @@ postsList.addEventListener('click', async (e) => {
     }
 
     // --- 6. 处理点击评论以进行回复 ---
-    const commentItem = target.closest('.comment-item');
-    if (commentItem) {
-        const commentIndex = parseInt(commentItem.dataset.commentIndex);
-        const post = await db.qzonePosts.get(postId);
-        if (post && post.comments && post.comments[commentIndex]) {
-            const parentComment = post.comments[commentIndex];
-            postContainer.dataset.replyToIndex = commentIndex; // 存储被回复评论的索引
-            postContainer.dataset.replyToName = parentComment.commenterName; // 存储被回复人的名字
-            
-            const footer = postContainer.querySelector('.post-footer');
-            const replyIndicator = footer.querySelector('.reply-indicator');
-            const replyIndicatorText = footer.querySelector('.reply-indicator-text');
-            const commentInput = footer.querySelector('.comment-input');
-            
-            replyIndicatorText.textContent = `回复 @${parentComment.commenterName}:`;
-            replyIndicator.classList.add('visible');
-            commentInput.focus();
-        }
-        return;
+const commentItem = target.closest('.comment-item');
+if (commentItem) {
+    const commentIndex = parseInt(commentItem.dataset.commentIndex);
+    const post = await db.qzonePosts.get(postId);
+    if (post && post.comments && post.comments[commentIndex]) {
+        const parentComment = post.comments[commentIndex];
+        postContainer.dataset.replyToIndex = commentIndex; 
+        postContainer.dataset.replyToName = parentComment.commenterName;
+        
+        const footer = postContainer.querySelector('.post-footer');
+        const replyIndicator = footer.querySelector('.reply-indicator');
+        const replyIndicatorText = footer.querySelector('.reply-indicator-text');
+        const commentInput = footer.querySelector('.comment-input');
+        
+        replyIndicatorText.textContent = `正在回复 @${parentComment.commenterName}`;
+        replyIndicator.classList.add('visible');
+        commentInput.placeholder = `回复 @${parentComment.commenterName}:`;
+        commentInput.focus();
     }
+    return;
+}
     
 const sendBtn = target.closest('.comment-send-btn');
 if (sendBtn) {
@@ -14875,7 +14866,9 @@ if (sendBtn) {
     postContainer.dataset.replyToName = '';
     const replyIndicator = postContainer.querySelector('.reply-indicator');
     if(replyIndicator) replyIndicator.classList.remove('visible');
-    await renderQzonePosts();
+    commentInput.placeholder = '说点什么吧~';
+
+await renderQzonePosts();
     
     if (post.authorId !== 'user' && state.chats[post.authorId]) {
         triggerAiQzoneCommentResponse(post.authorId, postId, newComment);
