@@ -7926,9 +7926,14 @@ async function openChat(chatId) {
 async function triggerAiResponse(chatIdOverride = null) {
     const chatId = chatIdOverride || state.activeChatId;
     if (!chatId) return;
-    const chat = state.chats[chatId];
+        const chat = state.chats[chatId];
 
-const chatHeaderTitle = document.getElementById('chat-header-title');
+    if (!chat) {
+        console.error(`triggerAiResponse called for a non-existent chatId: ${chatId}`);
+        return; 
+    }
+
+    const chatHeaderTitle = document.getElementById('chat-header-title');
     const typingIndicator = document.getElementById('typing-indicator');
     if (chat.isGroup) {
         if (typingIndicator) {
@@ -13605,7 +13610,7 @@ document.getElementById('send-btn').addEventListener('click', async () => {
     // --- 【核心修改】发送后，取消引用模式 ---
     cancelReplyMode(); 
 });
-            document.getElementById('wait-reply-btn').addEventListener('click', triggerAiResponse);
+            document.getElementById('wait-reply-btn').addEventListener('click', () => triggerAiResponse());
             chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); document.getElementById('send-btn').click(); } });
 	    const sendBtn = document.getElementById('send-btn');
 chatInput.addEventListener('input', () => {
