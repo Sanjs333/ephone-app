@@ -9813,7 +9813,9 @@ ${worldBookContent} // <--【核心】在这里注入世界书内容
     // 【核心修复】在这里构建 messagesPayload
     const messagesPayload = [];
     messagesPayload.push({ role: 'system', content: systemPrompt });
-
+	
+let dynamicContext = '';
+	
 try {
     const allRecentPosts = await db.qzonePosts.orderBy('timestamp').reverse().limit(3).toArray();
     // 【核心修改】在这里插入过滤步骤
