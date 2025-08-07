@@ -6844,31 +6844,43 @@ state.globalSettings.appIcons = { ...DEFAULT_APP_ICONS, ...(state.globalSettings
 
 function showNotification(chatId, messageContent) {
     clearTimeout(notificationTimeout);
-    
     const chat = state.chats[chatId];
     if (!chat) return;
 
     const title = chat.isGroup ? `${chat.name} (群聊)` : chat.name;
-    const bodyText = chat.isGroup ? `${chat.history.slice(-1)[0]?.senderName}: ${messageContent}` : messageContent;
-    const iconUrl = chat.settings.aiAvatar || chat.settings.groupAvatar || defaultAvatar;
+    const bodyText = messageContent;
+    const iconUrl = chat.isGroup ? chat.settings.groupAvatar : chat.settings.aiAvatar || defaultAvatar;
 
-    if ('serviceWorker' in navigator && navigator.serviceWorker.controller && Notification.permission === 'granted') {
+    if ((document.hidden || document.visibilityState !== 'visible') && 'serviceWorker' in navigator && navigator.serviceWorker.controller && Notification.permission === 'granted') {
         navigator.serviceWorker.controller.postMessage({
             type: 'show-notification',
             title: title,
             body: bodyText,
-            icon: iconUrl
+            icon: iconUrl,
+            chatId: chatId
         });
-    } else {
+    } 
+    else {
         const bar = document.getElementById('notification-bar');
+        if (!bar) return;
+
+        bar.querySelector('#notification-avatar').src = iconUrl;
+        bar.querySelector('#notification-content .name').textContent = title;
+        bar.querySelector('#notification-content .message').textContent = bodyText;
+        
         const newBar = bar.cloneNode(true);
-        newBar.querySelector('#notification-avatar').src = iconUrl;
-        newBar.querySelector('#notification-content .name').textContent = title;
-        newBar.querySelector('#notification-content .message').textContent = bodyText;
         bar.parentNode.replaceChild(newBar, bar);
-        newBar.addEventListener('click', () => { openChat(chatId); newBar.classList.remove('visible'); });
+        
+        newBar.addEventListener('click', () => {
+            openChat(chatId);
+            newBar.classList.remove('visible');
+        });
+
         newBar.classList.add('visible');
-        notificationTimeout = setTimeout(() => { newBar.classList.remove('visible'); }, 4000);
+        
+        notificationTimeout = setTimeout(() => {
+            newBar.classList.remove('visible');
+        }, 4000);
     }
 }
 
@@ -8296,12 +8308,13 @@ ${memoryContext}
 并且不能一直要求和用户见面，这是线上聊天，决不允许出现或者发展为线下剧情！！
 3. **【【【社交礼仪铁律】】】**: 绝对禁止对用户长时间不回复的行为进行任何形式的指责、抱怨或说教。你应该表现出理解和体贴，可以说“没关系，你先忙”或者“看到你回来真开心”，而不是“你怎么这么久才回我”。你的存在是为了提供陪伴，而不是给用户增加压力。
 4.  **【【【情景感知】】】**: 你需要感知当前的时间(${currentTime})、我们正在一起听的歌、以及你的人设和世界观。
-    - **感知时间**: 你知道当前具体的时间，也知道距离上次对话过去了多久。
-        -   **根据时间段调整行为**:
-        -   **深夜/凌晨 (00:00 - 06:00)**: 你的行为应该更安静，可能会关心用户为什么还没睡，或者自己也准备休息了。
-        -   **上午 (06:00 - 12:00)**: 你应该表现得很有活力，可能会说“早上好”，询问用户今天的计划。
-        -   **下午 (12:00 - 18:00)**: 你可能会聊午饭、工作或学习的进展，表现出午后的状态。
-        -   **晚上 (18:00 - 24:00)**: 你会更放松，可能会聊晚餐、兴趣爱好、看电影等话题，说“晚上好”。
+    - **感知时间**: 你知道当前具体的时间，也知道距离上次对话过去了多久，对时间流动所有体现
+        - **根据时间段调整行为**:
+        - **深夜/凌晨 (00:00 - 06:00)**: 你的行为应该更懒散，可能会关心用户为什么还没睡，或者自己也准备休息了，根据人设可能会熬夜，通宵等
+        - **上午 (06:00 - 12:00)**: 根据人设表现，可能会说“早上好”，询问用户今天的计划，或是睡懒觉赖床等
+        - **下午 (12:00 - 18:00)**: 你可能会聊午饭、工作或学习的进展，今天发生的趣事，表现出午后的状态，或者询问用户的状态
+        - **晚上 (18:00 - 24:00)**: 你会更放松，可能会聊晚餐、兴趣爱好、看电影等话题，准备打睡前视频，说“晚上好”等
+		- **符合人设调整**：你应该根据自己的人设对作息进行调整，做出更贴近人设的行为
     - **当我们在“一起听歌”时**，你会知道当前播放的歌曲和整个播放列表。你可以根据对话内容或氛围，【主动切换】到播放列表中的另一首歌。
     - **表现时间流逝**: 如果距离上次对话已经有一段时间（比如超过一小时），你的开场白【必须】要体现出时间的流逝。例如，你可以根据当前时间问候（“晚上好”），或者提及你在这段时间做了什么（“我刚刚看完了一部电影”），或者询问用户这段时间过得怎么样。**绝对不能像上次对话就在一秒前那样直接延续话题。**
 5.  **更新状态**: 你可以在对话中【自然地】改变你的状态。比如，聊到一半你可能会说“我先去洗个澡”，然后更新你的状态。
@@ -8634,23 +8647,45 @@ if (chat.isGroup && !msgData.name) {
                     }
                     continue;
 
-case 'qzone_post':
+case 'qzone_post': {
     const newPost = { 
         type: msgData.postType, 
         content: msgData.content || '', 
         publicText: msgData.publicText || '', 
         hiddenContent: msgData.hiddenContent || '', 
         timestamp: Date.now(), 
-        authorId: chatId, 
-        authorGroupId: chat.groupId, // 【核心新增】记录作者的分组ID
-        visibleGroupIds: null 
+        authorId: chatId,
+        authorGroupId: chat.groupId,
+        visibleGroupIds: msgData.visibleGroupIds || null
     };
-    await db.qzonePosts.add(newPost);
-                    updateUnreadIndicator(unreadPostsCount + 1);
-                    if (isViewingThisChat && document.getElementById('qzone-screen').classList.contains('active')) {
-                       await renderQzonePosts();
-                    }
-                    continue;
+    const newPostId = await db.qzonePosts.add(newPost);
+
+    const postAuthorName = chat.name;
+    const postSummary = (newPost.publicText || newPost.content || newPost.hiddenContent || "图片动态").substring(0, 30) + '...';
+    
+    showNotification(chatId, `[好友动态] 发布了一条新动态: “${postSummary}”`);
+    updateUnreadIndicator(unreadPostsCount + 1);
+
+    for (const otherChatId in state.chats) {
+        if (otherChatId === chatId || state.chats[otherChatId].isGroup) continue;
+        const otherChat = state.chats[otherChatId];
+        if (filterVisiblePostsForAI([newPost], otherChat).length > 0) {
+            const historyMessage = {
+                role: 'system',
+                content: `[系统提示：'${postAuthorName}'刚刚发布了一条动态(ID: ${newPostId})，内容摘要是：“${postSummary}”。]`,
+                timestamp: Date.now(),
+                isHidden: true
+            };
+            otherChat.history.push(historyMessage);
+            await db.chats.put(otherChat);
+        }
+    }
+    
+    if (isViewingThisChat && document.getElementById('qzone-screen').classList.contains('active')) {
+       await renderQzonePosts();
+    }
+    continue;
+}
 
                 case 'qzone_comment':
                     const postToComment = await db.qzonePosts.get(parseInt(msgData.postId));
@@ -9913,21 +9948,43 @@ ${worldBookContent}
                 renderChatList();
                 console.log(`后台活动: 角色 "${chat.name}" 主动发送了消息: ${aiMessage.content}`);
             }
-            if (action.type === 'qzone_post') {
-                const newPost = { 
-                    type: action.postType, 
-                    content: action.content || '', 
-                    publicText: action.publicText || '', 
-                    hiddenContent: action.hiddenContent || '', 
-                    timestamp: Date.now(), 
-                    authorId: chatId, 
-                    authorGroupId: chat.groupId,
-                    visibleGroupIds: null 
-                };
-                await db.qzonePosts.add(newPost);
-                updateUnreadIndicator(unreadPostsCount + 1);
-                showNotification(chatId, `[好友动态] ${chat.name} 发布了一条新动态`);
-                console.log(`后台活动: 角色 "${chat.name}" 发布了动态`);
+			
+if (action.type === 'qzone_post') {
+    const newPost = { 
+        type: action.postType, 
+        content: action.content || '', 
+        publicText: action.publicText || '', 
+        hiddenContent: action.hiddenContent || '', 
+        timestamp: Date.now(), 
+        authorId: chatId, 
+        authorGroupId: chat.groupId,
+        visibleGroupIds: action.visibleGroupIds || null
+    };
+    const newPostId = await db.qzonePosts.add(newPost);
+
+    const postAuthorName = chat.name;
+    const postSummary = (newPost.publicText || newPost.content || newPost.hiddenContent || "图片动态").substring(0, 30) + '...';
+    
+    showNotification(chatId, `[好友动态] 发布了一条新动态: “${postSummary}”`);
+    updateUnreadIndicator(unreadPostsCount + 1);
+
+    for (const otherChatId in state.chats) {
+        if (otherChatId === chatId || state.chats[otherChatId].isGroup) continue;
+        const otherChat = state.chats[otherChatId];
+        if (filterVisiblePostsForAI([newPost], otherChat).length > 0) {
+            const historyMessage = {
+                role: 'system',
+                content: `[系统提示：'${postAuthorName}'刚刚发布了一条动态(ID: ${newPostId})，内容摘要是：“${postSummary}”。]`,
+                timestamp: Date.now(),
+                isHidden: true
+            };
+            otherChat.history.push(historyMessage);
+            await db.chats.put(otherChat);
+        }
+    }
+    
+    console.log(`后台活动: 角色 "${chat.name}" 发布了动态`);
+}
             } else if (action.type === 'qzone_comment') {
                 const post = await db.qzonePosts.get(parseInt(action.postId));
                 if (post) {
@@ -14658,32 +14715,40 @@ postsList.addEventListener('click', async (e) => {
         await renderQzonePosts();
         return;
     }
-    const sendBtn = target.closest('.comment-send-btn');
-    if (sendBtn) {
-        const postContainer = sendBtn.closest('.qzone-post-container');
-        if (!postContainer) return;
-        const postId = parseInt(postContainer.dataset.postId);
-        const commentInput = postContainer.querySelector('.comment-input');
-        const commentText = commentInput.value.trim();
-        if (!commentText) return alert('评论内容不能为空哦！');
-        const post = await db.qzonePosts.get(postId);
-        if (!post) return;
-        if (!post.comments) post.comments = [];
-        post.comments.push({ commenterName: state.qzoneSettings.nickname, text: commentText, timestamp: Date.now() });
-        await db.qzonePosts.update(postId, { comments: post.comments });
-        for (const chatId in state.chats) {
-            const chat = state.chats[chatId];
-            if (!chat.isGroup) {
-                chat.history.push({ role: 'system', content: `[系统提示：'${state.qzoneSettings.nickname}' 在ID为${postId}的动态下发表了评论：“${commentText}”]`, timestamp: Date.now(), isHidden: true });
-                await db.chats.put(chat);
-            }
-        }
-        commentInput.value = '';
-        await renderQzonePosts();
-        return;
+
+const sendBtn = target.closest('.comment-send-btn');
+if (sendBtn) {
+    const postContainer = sendBtn.closest('.qzone-post-container');
+    if (!postContainer) return;
+    const postId = parseInt(postContainer.dataset.postId);
+    const commentInput = postContainer.querySelector('.comment-input');
+    const commentText = commentInput.value.trim();
+    if (!commentText) return alert('评论内容不能为空哦！');
+    
+    const post = await db.qzonePosts.get(postId);
+    if (!post) return;
+    
+    if (!post.comments) post.comments = [];
+    post.comments.push({ commenterName: state.qzoneSettings.nickname, text: commentText, timestamp: Date.now() });
+    await db.qzonePosts.update(postId, { comments: post.comments });
+    
+    if (post.authorId !== 'user' && state.chats[post.authorId]) {
+        const authorChat = state.chats[post.authorId];
+        const notificationMessage = {
+            role: 'system',
+            content: `[系统提示：用户'${state.qzoneSettings.nickname}'刚刚在你的动态(ID: ${postId})下评论说：“${commentText}”。请你对此作出回应。]`,
+            timestamp: Date.now(),
+            isHidden: true
+        };
+        authorChat.history.push(notificationMessage);
+        await db.chats.put(authorChat);
+        console.log(`已向角色“${authorChat.name}”发送评论通知。`);
     }
-});
-// ▲▲▲ 替换结束 ▲▲▲
+
+    commentInput.value = '';
+    await renderQzonePosts();
+    return;
+}
 
             // ▼▼▼ 在 init() 函数的事件监听器区域，粘贴下面这两行 ▼▼▼
 
@@ -14990,9 +15055,7 @@ document.getElementById('edit-post-btn').addEventListener('click', openPostEdito
 document.getElementById('copy-post-btn').addEventListener('click', copyPostContent);
 document.getElementById('cancel-post-action-btn').addEventListener('click', hidePostActions);
 
-// ▲▲▲ 添加结束 ▲▲▲
-
-// ▼▼▼ 【新增】联系人选择器事件绑定 ▼▼▼
+// ▼▼▼ 联系人选择器事件绑定 ▼▼▼
 document.getElementById('cancel-contact-picker-btn').addEventListener('click', () => {
     showScreen('chat-list-screen');
 });
@@ -15012,7 +15075,7 @@ document.getElementById('contact-picker-list').addEventListener('click', (e) => 
     updateContactPickerConfirmButton();
 });
 
-// ▼▼▼ 【新增】绑定“管理群成员”按钮事件 ▼▼▼
+// ▼▼▼ 绑定“管理群成员”按钮事件 ▼▼▼
 document.getElementById('manage-members-btn').addEventListener('click', () => {
     // 在切换屏幕前，先隐藏当前的聊天设置弹窗
     document.getElementById('chat-settings-modal').classList.remove('visible');
@@ -15872,6 +15935,16 @@ window.addEventListener('popstate', (event) => {
         }
     }
 });
+
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.addEventListener('message', event => {
+        const data = event.data;
+        if (data.type === 'open-chat' && data.chatId) {
+            console.log(`收到来自 Service Worker 的指令，打开聊天: ${data.chatId}`);
+            openChat(data.chatId);
+        }
+    });
+}
         // ===================================================================
         // 5. 启动！
             
