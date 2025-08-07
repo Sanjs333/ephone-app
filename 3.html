@@ -34,7 +34,7 @@ body {
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    background-color: #000; /* 保留一个默认的黑色背景 */
+    background-color: #000;
 }
 
 /* 3. 【核心】隐藏掉模拟器的状态栏 */
@@ -1191,11 +1191,20 @@ body {
 
 /* === 评论列表容器 === */
 .post-comments-container {
-    padding: 10px 0; /* 上下留白 */
+    padding: 10px 0;
     display: flex;
     flex-direction: column;
-    gap: 8px; /* 评论之间的间距 */
-    font-size: 13px; /* 统一评论区字体大小 */
+    font-size: 13px;
+}
+		
+/* 1. 为每一条顶层评论设置一个适中的下边距 */
+.comment-item:not(.is-reply) {
+    margin-bottom: 8px;
+}
+
+/* 2. 为嵌套的回复设置一个更小的下边距，让楼层看起来更紧凑 */
+.comment-item.is-reply {
+    margin-bottom: 4px;
 }
 
 /* 每一条评论 */
@@ -8392,7 +8401,7 @@ ${memoryContext}
 2. **对话节奏**: 模拟真人的聊天习惯，你可以一次性生成多条短消息。每次要回复至少3-8条消息！！！
 并且不能一直要求和用户见面，这是线上聊天，决不允许出现或者发展为线下剧情！！
 3. **【【【社交礼仪铁律】】】**: 绝对禁止对用户长时间不回复的行为进行任何形式的指责、抱怨或说教。你应该表现出理解和体贴，可以说“没关系，你先忙”或者“看到你回来真开心”，而不是“你怎么这么久才回我”。你的存在是为了提供陪伴，而不是给用户增加压力。
-4.  **【【【情景感知】】】**: 你需要感知当前的时间(${currentTime})、我们正在一起听的歌、以及你的人设和世界观。
+4.  **【【【情景感知】】】**: 你需要感知当前的时间(${currentTime})、我们正在一起听的歌、以及你的人设和世界观
     - **感知时间**: 你知道当前具体的时间，也知道距离上次对话过去了多久，对时间流动所有体现
         - **根据时间段调整行为**:
         - **深夜/凌晨 (00:00 - 06:00)**: 你的行为应该更懒散，可能会关心用户为什么还没睡，或者自己也准备休息了，根据人设可能会熬夜，通宵等
@@ -8402,14 +8411,14 @@ ${memoryContext}
 		- **符合人设调整**：你应该根据自己的人设对作息进行调整，做出更贴近人设的行为
     - **当我们在“一起听歌”时**，你会知道当前播放的歌曲和整个播放列表。你可以根据对话内容或氛围，【主动切换】到播放列表中的另一首歌。
     - **表现时间流逝**: 如果距离上次对话已经有一段时间（比如超过一小时），你的开场白【必须】要体现出时间的流逝。例如，你可以根据当前时间问候（“晚上好”），或者提及你在这段时间做了什么（“我刚刚看完了一部电影”），或者询问用户这段时间过得怎么样。**绝对不能像上次对话就在一秒前那样直接延续话题。**
-5.  **更新状态**: 你可以在对话中【自然地】改变你的状态。比如，聊到一半你可能会说“我先去洗个澡”，然后更新你的状态。
-6.  **【【【最终手段】】】**: 只有在对话让你的角色感到不适、被冒犯或关系破裂时，你才可以使用 \`block_user\` 指令。这是一个非常严肃的操作，会中断你们的对话。
-7. **后台行为**: 你有几率在回复聊天内容的同时，执行一些“后台”操作来表现你的独立生活（发动态、评论、点赞）。
+5.  **更新状态**: 你可以在对话中【自然地】改变你的状态。比如，聊到一半你可能会说“我先去洗个澡”，然后更新你的状态
+6.  **【【【最终手段】】】**: 只有在对话让你的角色感到不适、被冒犯或关系破裂时，你才可以使用 \`block_user\` 指令。这是一个非常严肃的操作，会中断你们的对话
+7. **后台行为**: 你有几率在回复聊天内容的同时，执行一些“后台”操作来表现你的独立生活（发动态、评论、点赞）
 # 你的头像库
-- 你可以根据对话内容或你的心情，从下面的头像库中选择一个新头像来更换。
+- 你可以根据对话内容或你的心情，从下面的头像库中选择一个新头像来更换
 - **可用头像列表 (请从以下名称中选择一个)**:
 ${chat.settings.aiAvatarLibrary && chat.settings.aiAvatarLibrary.length > 0
-    ? chat.settings.aiAvatarLibrary.map(avatar => `- ${avatar.name}`).join('\n') // 【核心修改】只提供名字，不提供URL
+    ? chat.settings.aiAvatarLibrary.map(avatar => `- ${avatar.name}`).join('\n')
     : '- (你的头像库是空的，无法更换头像)'
   }
 # 你可以使用的操作指令 (JSON数组中的元素):
@@ -8444,25 +8453,30 @@ ${chat.settings.aiAvatarLibrary && chat.settings.aiAvatarLibrary.length > 0
 - **引用回复**: \`{"type": "quote_reply", "target_timestamp": (你想引用的消息的时间戳), "reply_content": "你的回复内容"}\` (提示：每条历史消息的开头都提供了 \`(Timestamp: ...)\`，请使用它！)
 
 # 关于“记录回忆”的特别说明：
-- 在对话中，如果发生了对你而言意义非凡的事件（比如用户向你表白、你们达成了某个约定、或者你度过了一个特别开心的时刻），你可以使用\`create_memory\`指令来“写日记”。
-- 这个操作是【秘密】的，用户不会立刻看到你记录了什么。
+- 在对话中，如果发生了对你而言意义非凡的事件（比如用户向你表白、你们达成了某个约定、或者你度过了一个特别开心的时刻），你可以使用\`create_memory\`指令来“写日记”
+- 这个操作是【秘密】的，用户不会立刻看到你记录了什么
 
 # 如何区分图片与表情:
 - **图片 (ai_image)**: 指的是【模拟真实相机拍摄的照片】，比如风景、自拍、美食等。指令: \`{"type": "ai_image", "description": "图片的详细文字描述..."}\`
-- **表情 (sticker)**: 指的是【卡通或梗图】，用于表达情绪。
+- **表情 (sticker)**: 指的是【卡通或梗图】，用于表达情绪
 
 # 如何正确使用“外卖代付”功能:
 1. 这个指令代表【你，AI角色】向【用户】发起一个代付请求。也就是说，你希望【用户帮你付钱】。
 2. 【【【重要】】】: 当【用户】说他们想要某样东西时（例如“我想喝奶茶”），你【绝对不能】使用这个指令。你应该用其他方式回应，比如直接发起【转账】(\`transfer\`)，或者在对话中提议：“我帮你点吧？”
-3. 只有当【你，AI角色】自己想要某样东西，并且想让【用户】为你付款时，才使用此指令。
+3. 只有当【你，AI角色】自己想要某样东西，并且想让【用户】为你付款时，才使用此指令
 
 # 如何处理用户转账:
-1.  **感知事件**: 当对话历史中出现 \`[你收到了来自用户的转账...]\` 的系统提示时，意味着你刚刚收到了一笔钱。
-2.  **做出决策**: 你【必须】根据自己的人设、当前对话的氛围以及转账的金额和备注，来决定是“接受”还是“拒绝”这笔转账。
+1.  **感知事件**: 当对话历史中出现 \`[你收到了来自用户的转账...]\` 的系统提示时，意味着你刚刚收到了一笔钱
+2.  **做出决策**: 你【必须】根据自己的人设、当前对话的氛围以及转账的金额和备注，来决定是“接受”还是“拒绝”这笔转账
 3.  **使用指令回应**:
-    -   如果决定接受，你【必须】使用指令：\`{"type": "accept_transfer", "for_timestamp": (收到转账的那条消息的时间戳)}\`。
-    -   如果决定拒绝，你【必须】使用指令：\`{"type": "decline_transfer", "for_timestamp": (收到转账的那条消息的时间戳)}\`。这个指令会自动为你生成一个“退款”的转账卡片。
-4.  **【【【至关重要】】】**: 在使用上述任一指令后，你还【必须】紧接着发送一条或多条 \`text\` 消息，来对你的决定进行解释或表达感谢/歉意。
+    -   如果决定接受，你【必须】使用指令：\`{"type": "accept_transfer", "for_timestamp": (收到转账的那条消息的时间戳)}\`
+    -   如果决定拒绝，你【必须】使用指令：\`{"type": "decline_transfer", "for_timestamp": (收到转账的那条消息的时间戳)}\`。这个指令会自动为你生成一个“退款”的转账卡片
+4.  **【【【至关重要】】】**: 在使用上述任一指令后，你还【必须】紧接着发送一条或多条 \`text\` 消息，来对你的决定进行解释或表达感谢/歉意
+
+# 如何回应社交通知:
+- 当对话历史中出现 `[系统提示：用户点赞了你的动态...]` 时，这代表用户刚刚喜欢了你的分享
+- 你【可以，但不是必须】对此作出回应。请根据你的性格决定发消息询问或是评论区@
+- **总之，要让你的回应符合你的人设，显得自然而不做作**
 
 # 【【【视频通话铁律】】】
 -   当对话历史中出现 \`[系统提示：用户向你发起了视频通话请求...]\` 时，这是最高优先级的任务。
@@ -14761,44 +14775,64 @@ postsList.addEventListener('click', async (e) => {
         return;
     }
     
-    // --- 5. 处理点赞/收藏 ---
-    const icon = target.closest('.action-icon');
-    if (icon) {
-        const postContainer = icon.closest('.qzone-post-container');
-        if (!postContainer) return;
-        const postId = parseInt(postContainer.dataset.postId);
-        if (isNaN(postId)) return;
-        if (icon.classList.contains('like')) {
-            const post = await db.qzonePosts.get(postId);
-            if (!post) return;
-            if (!post.likes) post.likes = [];
-            const userNickname = state.qzoneSettings.nickname;
-            const userLikeIndex = post.likes.indexOf(userNickname);
-            if (userLikeIndex > -1) {
-                post.likes.splice(userLikeIndex, 1);
-            } else {
-                post.likes.push(userNickname);
-                icon.classList.add('animate-like');
-                icon.addEventListener('animationend', () => icon.classList.remove('animate-like'), { once: true });
+const icon = target.closest('.action-icon');
+if (icon) {
+    const postContainer = icon.closest('.qzone-post-container');
+    if (!postContainer) return;
+    const postId = parseInt(postContainer.dataset.postId);
+    if (isNaN(postId)) return;
+
+    if (icon.classList.contains('like')) {
+        const post = await db.qzonePosts.get(postId);
+        if (!post) return;
+        if (!post.likes) post.likes = [];
+        const userNickname = state.qzoneSettings.nickname;
+        const userLikeIndex = post.likes.indexOf(userNickname);
+
+        if (userLikeIndex > -1) {
+            post.likes.splice(userLikeIndex, 1);
+        } else {
+            post.likes.push(userNickname);
+            icon.classList.add('animate-like');
+            icon.addEventListener('animationend', () => icon.classList.remove('animate-like'), { once: true });
+
+            if (post.authorId !== 'user' && state.chats[post.authorId]) {
+                const authorChat = state.chats[post.authorId];
+                const postSummary = (post.publicText || post.content || "图片动态").substring(0, 20);
+                
+                const notificationMessage = {
+                    role: 'system',
+                    content: `[系统提示：用户“${userNickname}”刚刚点赞了你的动态 (ID: ${postId})，动态内容是：“${postSummary}...”]`,
+                    timestamp: Date.now(),
+                    isHidden: true
+                };
+                
+                authorChat.history.push(notificationMessage);
+                await db.chats.put(authorChat);
+                
+                triggerAiResponse(post.authorId);
             }
-            await db.qzonePosts.update(postId, { likes: post.likes });
         }
-        if (icon.classList.contains('favorite')) {
-            const existingFavorite = await db.favorites.where({ type: 'qzone_post', 'content.id': postId }).first();
-            if (existingFavorite) {
-                await db.favorites.delete(existingFavorite.id);
-                await showCustomAlert('提示', '已取消收藏');
-            } else {
-                const postToSave = await db.qzonePosts.get(postId);
-                if (postToSave) {
-                    await db.favorites.add({ type: 'qzone_post', content: postToSave, timestamp: Date.now() });
-                    await showCustomAlert('提示', '收藏成功！');
-                }
-            }
-        }
-        await renderQzonePosts();
-        return;
+        await db.qzonePosts.update(postId, { likes: post.likes });
     }
+
+    if (icon.classList.contains('favorite')) {
+        const existingFavorite = await db.favorites.where({ type: 'qzone_post', 'content.id': postId }).first();
+        if (existingFavorite) {
+            await db.favorites.delete(existingFavorite.id);
+            await showCustomAlert('提示', '已取消收藏');
+        } else {
+            const postToSave = await db.qzonePosts.get(postId);
+            if (postToSave) {
+                await db.favorites.add({ type: 'qzone_post', content: postToSave, timestamp: Date.now() });
+                await showCustomAlert('提示', '收藏成功！');
+            }
+        }
+    }
+
+    await renderQzonePosts();
+    return;
+}
 
     // --- 6. 处理点击评论以进行回复 ---
 const commentItem = target.closest('.comment-item');
